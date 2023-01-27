@@ -1,8 +1,8 @@
 debug: false
 chrome_driver_url: "http://localhost:9515"
 account:
-  uin: 3070941524
-  pwd: "qQ18227914"
+  uin:
+  pwd: ""
 
 setu:
   # 色图自动撤回时间
