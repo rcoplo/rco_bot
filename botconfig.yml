@@ -1,0 +1,18 @@
+debug: false
+chrome_driver_url: "http://localhost:9515"
+account:
+  uin: 3070941524
+  pwd: "qQ18227914"
+
+setu:
+  # 色图自动撤回时间
+  recall_time: 60
+  # 色图是否保存本地
+  whether_to_save_locally: false
+
+# 最高权限管理 高过 群主/管理员
+super_admin:
+  - 2939599299
+# 对bot的称呼
+bot_name:
+  - "小白"
