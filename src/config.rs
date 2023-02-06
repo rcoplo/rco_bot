@@ -2,6 +2,7 @@
 pub struct RcoBotConfig {
     pub debug: bool,
     pub chrome_driver_url: String,
+    pub login_type:String,
     pub account:Account,
     pub setu:SetuConfig,
     pub super_admin:Vec<String>,

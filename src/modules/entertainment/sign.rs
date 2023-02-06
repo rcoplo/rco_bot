@@ -1,5 +1,6 @@
 use chrono::{Datelike, NaiveDateTime, TimeZone};
 use proc_qq::{event, GroupMessageEvent, MessageContentTrait, Module, module};
+use rand::prelude::SliceRandom;
 use rand::Rng;
 use crate::{BotResult, CONTEXT};
 use crate::database::table::Sign;
@@ -42,7 +43,8 @@ async fn sign(event:&GroupMessageEvent) -> anyhow::Result<bool> {
     if Reg::ex(&content,&["小白摸+","摸+小白"],None){
         let sign = CONTEXT.sign.select_sign(&event.inner.from_uin).await;
         let time = chrono::Local::now().naive_local();
-        let rand_num = rand::thread_rng().gen_range(0,100);
+        let mut nums: Vec<i32> = (1..100).collect();
+        let rand_num = rand::thread_rng().gen_range(0..100);
         return match sign {
             Ok(data) => {
                 if time.day() == data.sign_time.day() {

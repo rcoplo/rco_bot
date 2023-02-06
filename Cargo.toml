@@ -30,7 +30,7 @@ regex = "1"
 chrono = "0"
 reqwest = {version = "0", features = ["json"]}
 hex = "0"
-rand = "0"
+rand = {version = "0", features = ["std_rng"]}
 
 async-trait = "0"
 

@@ -3108,7 +3108,7 @@ dependencies = [
  "og_image_writer",
  "once_cell",
  "proc_qq",
- "rand 0.7.3",
+ "rand 0.8.5",
  "rbatis",
  "rbdc-sqlite",
  "rbs",

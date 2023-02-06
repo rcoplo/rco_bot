@@ -41,10 +41,10 @@ impl Default for Help {
         let mut map = HashMap::new();
         let setu = SetuHelp::default();
         let sign = SignHelp::default();
-        map.insert(&setu.mod_name,HelpEnum::Setu(setu));
-        map.insert(&sign.mod_name,HelpEnum::Sign(sign));
+        map.insert(setu.mod_name.clone(),HelpEnum::Setu(setu));
+        map.insert(sign.mod_name.clone(),HelpEnum::Sign(sign));
         Self{
-            help: map.iter().map(|(k, _)| { *k}).collect::<HashMap<String,HelpEnum>>(),
+            help: map,
         }
     }
 }

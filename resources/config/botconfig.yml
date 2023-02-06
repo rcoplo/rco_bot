@@ -1,6 +1,8 @@
 debug: false
 chrome_driver_url: "http://localhost:9515"
 # QQ的账号密码
+#登录方式,如果qq号有验证可以先设置为 qr_code 扫描登录后,再设置为 uin_pwd 账号密码登录
+login_type: "uin_pwd"
 account:
   uin:
   pwd: ""

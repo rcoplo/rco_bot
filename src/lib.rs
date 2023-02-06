@@ -69,19 +69,19 @@ impl BotConText {
         let path = get_resources_path(vec!["data", "bot.db"]);
         tracing::debug!("{}", &path);
         self.rbatis.init(SqliteDriver {}, path.as_str()).unwrap();
-        // let mut s = SqliteTableSync::default();
-        // s.sql_id = " PRIMARY KEY AUTOINCREMENT NOT NULL ".to_string();
-        // // bili_push
-        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush::default()), "bili_push")
-        //     .await
-        //     .unwrap();
-        // // osu_sb
-        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(OsuSb::default()), "osu_sb")
-        //     .await
-        //     .unwrap();
-        // // Sign
-        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(Sign::default()), "sign")
-        //     .await
-        //     .unwrap();
+        let mut s = SqliteTableSync::default();
+        s.sql_id = " PRIMARY KEY AUTOINCREMENT NOT NULL ".to_string();
+        // bili_push
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush::default()), "bili_push")
+            .await
+            .unwrap();
+        // osu_sb
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(OsuSb::default()), "osu_sb")
+            .await
+            .unwrap();
+        // Sign
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(Sign::default()), "sign")
+            .await
+            .unwrap();
     }
 }

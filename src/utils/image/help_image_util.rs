@@ -25,7 +25,7 @@ pub fn help_module_image(help:&Vec<String>) -> BotResult<Vec<u8>>{
         writer.set_text(
             text.as_str(),
             style::Style {
-                margin: style::Margin(0, 0, 0, 0),
+                margin: style::Margin(0, 20, 0, 20),
                 line_height: 5.,
                 font_size: 35.,
                 word_break: style::WordBreak::Normal,

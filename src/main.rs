@@ -22,14 +22,23 @@ async fn main() -> anyhow::Result<()> {
     init_tracing_subscriber();
     CONTEXT.init_pool().await;
     let config = CONTEXT.config.clone();
+    let authentication=  match config.login_type.as_str() {
+        "uin_pwd" =>{
+            Authentication::UinPassword(
+                config.account.uin,
+                config.account.pwd,
+            )
+        }
+        "qr_code" =>{
+            Authentication::QRCode
+        }
+        _ => Authentication::Abandon
+    };
     let client = ClientBuilder::new()
         .device(DeviceSource::JsonFile("device.json".to_owned()))
         .version(&ANDROID_WATCH)
         .priority_session("session.token")
-        .authentication(Authentication::UinPassword(
-            config.account.uin,
-            config.account.pwd,
-        ))
+        .authentication(authentication)
         .show_slider_pop_menu_if_possible()
         .modules(modules::all_modules())
         .result_handlers(vec![on_result {}.into()])

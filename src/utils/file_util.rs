@@ -41,6 +41,7 @@ fn join_paths<P: AsRef<Path>>(paths: Vec<P>) -> String {
             for x in paths {
                 path = path.join(x);
             }
+            tracing::debug!("join_paths: {:?}", &path);
             return path.to_str().unwrap().to_string();
         }
     }
