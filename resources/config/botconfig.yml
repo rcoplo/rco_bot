@@ -1,11 +1,12 @@
 debug: false
 chrome_driver_url: "http://localhost:9515"
+# QQ的账号密码
 account:
   uin:
   pwd: ""
 
 setu:
-  # 色图自动撤回时间
+  # 色图自动撤回时间 单位: 秒
   recall_time: 60
   # 色图是否保存本地
   whether_to_save_locally: false
