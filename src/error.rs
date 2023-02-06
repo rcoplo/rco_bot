@@ -21,6 +21,13 @@ impl Display for BotError {
     }
 }
 
+impl BotError {
+    pub fn to_msg(&self) -> MessageChain {
+        match self {
+            BotError::MsgChain(err) => err.to_string().parse_message_chain()
+        }
+    }
+}
 impl StdError for BotError {}
 
 impl From<io::Error> for BotError {
@@ -59,6 +66,35 @@ impl From<rbatis::Error> for BotError {
         BotError::MsgChain(arg.to_string().parse_message_chain())
     }
 }
+
+impl From<reqwest::Error> for BotError {
+    fn from(arg: reqwest::Error) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<serde_json::Error> for BotError {
+    fn from(arg: serde_json::Error) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<og_image_writer::Error> for BotError {
+    fn from(arg: og_image_writer::Error) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+impl From<proc_qq::re_exports::ricq_core::RQError> for BotError {
+    fn from(arg:proc_qq::re_exports::ricq_core::RQError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+impl From<image::error::ImageError> for BotError {
+    fn from(arg:image::error::ImageError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
 impl From<thirtyfour::error::WebDriverError> for BotError {
     fn from(arg: thirtyfour::error::WebDriverError) -> Self {
         BotError::MsgChain(arg.to_string().parse_message_chain())

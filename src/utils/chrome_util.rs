@@ -4,8 +4,6 @@ use thirtyfour::{By, DesiredCapabilities, WebDriver};
 use thirtyfour::error::WebDriverResult;
 use crate::{BotError, BotResult, CONTEXT};
 
-
-
 pub async fn bili_dynamic_screenshot(uid:&i64) -> BotResult<Vec<u8>> {
     let dynamic_url = format!("https://space.bilibili.com/{}/dynamic", uid);
     let caps = DesiredCapabilities::chrome();

@@ -1,12 +1,21 @@
+/*
+ * @Author: RCOPLO
+ * @Date: 2023-01-25 15:47:04
+ * @LastEditors: RCOPLO
+ * @LastEditTime: 2023-01-31 00:23:21
+ * @FilePath: \RcoBot\src\main.rs
+ */
 
 use proc_qq::re_exports::ricq::version::ANDROID_WATCH;
-use proc_qq::{result, run_client, ClientBuilder, DeviceSource, Authentication, EventResult, ShowQR, CustomUinPassword};
+use proc_qq::{
+    result, run_client, Authentication, ClientBuilder, CustomUinPassword, DeviceSource,
+    EventResult, ShowQR,
+};
 use std::sync::Arc;
 use tracing::Level;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use RcoBot::{CONTEXT, modules};
-
+use rco_bot::{CONTEXT, modules};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -17,7 +26,10 @@ async fn main() -> anyhow::Result<()> {
         .device(DeviceSource::JsonFile("device.json".to_owned()))
         .version(&ANDROID_WATCH)
         .priority_session("session.token")
-        .authentication(Authentication::UinPassword(config.account.uin, config.account.pwd))
+        .authentication(Authentication::UinPassword(
+            config.account.uin,
+            config.account.pwd,
+        ))
         .show_slider_pop_menu_if_possible()
         .modules(modules::all_modules())
         .result_handlers(vec![on_result {}.into()])
@@ -45,11 +57,11 @@ fn init_tracing_subscriber() {
             tracing_subscriber::filter::Targets::new()
                 .with_target("ricq", Level::DEBUG)
                 .with_target("proc_qq", Level::DEBUG)
-                .with_target("RcoBot", Level::DEBUG)
+                .with_target("rco_bot", Level::DEBUG)
                 .with_target("rbatis", Level::DEBUG)
+                .with_target("tracing", Level::DEBUG),
         )
         .init();
-
 }
 
 #[result]

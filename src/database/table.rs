@@ -1,23 +1,15 @@
+use chrono::NaiveDateTime;
+use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
-pub const BILI_PUSH:&str = r##"
-create table bili_push
-(
-    id                  INTEGER not null
-        constraint table_name_pk
-            primary key autoincrement,
-    room_id             INTEGER not null,
-    uid                 INTEGER not null,
-    uname               TEXT,
-    group_id            TEXT,
-    live_status         INTEGER,
-    latest_video_time   INTEGER,
-    latest_dynamic_time INTEGER,
-    live_push           INTEGER default 1 not null,
-    video_push          INTEGER default 1 not null,
-    dynamic_push        INTEGER default 1 not null
-);
-"##;
+
+pub fn deserde_from_int<'de, D>(deserializer: D) -> Result<bool, D::Error>
+    where
+        D: Deserializer<'de>,
+{
+    let i = u32::deserialize(deserializer)?;
+    Ok(i == 0)
+}
 
 
 #[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
@@ -30,7 +22,26 @@ pub struct BiliPush{
     pub live_status:i32,
     pub latest_video_time:i64,
     pub latest_dynamic_time:i64,
-    pub live_push:i8,
-    pub video_push:i8,
-    pub dynamic_push:i8,
+    #[serde(deserialize_with = "deserde_from_int")]
+    pub live_push:bool,
+    #[serde(deserialize_with = "deserde_from_int")]
+    pub video_push:bool,
+    #[serde(deserialize_with = "deserde_from_int")]
+    pub dynamic_push:bool,
+}
+#[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
+pub struct Sign {
+    pub id:i32,
+    pub sign_time:NaiveDateTime,
+    pub user_id:i64,
+    pub favorability:f64,
+}
+
+#[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
+pub struct OsuSb{
+    pub id:i32,
+    pub user_id:i32,
+    pub user_name:String,
+    pub user_id_qq:i64,
+    pub mode:String
 }

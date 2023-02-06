@@ -1,5 +1,5 @@
 [package]
-name = "RcoBot"
+name = "rco_bot"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,7 +11,7 @@ serde = {version = "1",features = ["derive"]}
 serde_json = "1"
 serde_yaml = "0"
 
-proc_qq = "0.1"
+proc_qq = "0.1.19"
 anyhow = "1"
 
 tokio = { version = "1", features = ["full"] }
@@ -34,6 +34,7 @@ rand = "0"
 
 async-trait = "0"
 
-delay_timer = "0"
+image = "0.24.5"
+og_image_writer = "0.11.0"
 
 thirtyfour = "0"

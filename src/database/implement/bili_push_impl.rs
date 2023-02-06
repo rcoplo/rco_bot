@@ -9,6 +9,7 @@ use crate::{BotError, BotResult, pool};
 
 
 pub struct BiliPushImpl{}
+
 pub enum BiliPushType{
     Dynamic(bool),
     Video(bool),
@@ -25,9 +26,9 @@ impl BiliPushImpl {
                 uid:*uid,
                 uname:api.uname.clone(),
                 group_id:format!("{:?}",vec![*group_id]),
-                dynamic_push:1,
-                video_push:1,
-                live_push:1,
+                dynamic_push:true,
+                video_push:true,
+                live_push:true,
                 ..Default::default()
             };
             let res = BiliPush::insert(pool!(), &bili_push).await;
@@ -80,9 +81,7 @@ impl BiliPushImpl {
         match bili_push {
             None =>  Err(BotError::from("该up主本群还没有关注喵..., 请输入 /关注 <uid> 关注喵!")),
             Some(data) => {
-                return Ok((data.clone(),( self.int_to_bool(&data.dynamic_push),
-                           self.int_to_bool(&data.video_push),
-                          self.int_to_bool(&data.live_push),)));
+                return Ok((data.clone(),( data.dynamic_push, data.video_push, data.live_push),));
             }
         }
 
@@ -155,24 +154,23 @@ impl BiliPushImpl {
             None =>  Err(BotError::from("该up主本群还没有关注喵..., 请输入 /关注 <uid> 关注喵!")),
             Some(data) => {
                let bili_push =  match push_type {
-                    BiliPushType::Dynamic(bool) => {
-                        let dynamic_push = self.bool_to_int(bool);
+                    BiliPushType::Dynamic(dynamic_push) => {
                         BiliPush{
-                            dynamic_push,
+                            dynamic_push:*dynamic_push,
                             ..data
                         }
                     }
-                    BiliPushType::Video(bool) => {
-                        let video_push = self.bool_to_int(bool);
+                    BiliPushType::Video(video_push) => {
+
                         BiliPush{
-                            video_push,
+                            video_push:*video_push,
                             ..data
                         }
                     }
-                    BiliPushType::Live(bool) => {
-                        let live_push = self.bool_to_int(bool);
+                    BiliPushType::Live(live_push) => {
+
                         BiliPush{
-                            live_push,
+                            live_push:*live_push,
                             ..data
                         }
                     }
@@ -252,19 +250,6 @@ impl BiliPushImpl {
                     }
                 }
             }
-        }
-    }
-
-    fn int_to_bool(&self,int:&i8) -> bool {
-        match int {
-            1 => true ,
-            _ => false
-        }
-    }
-    fn bool_to_int(&self,bool:&bool) -> i8 {
-        match *bool {
-            true => 1,
-            _ => 0
         }
     }
 

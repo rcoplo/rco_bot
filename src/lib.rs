@@ -24,7 +24,10 @@ pub use error::{
     BotResult, BotError
 };
 use crate::database::implement::bili_push_impl::BiliPushImpl;
-use crate::database::table::BiliPush;
+use crate::database::implement::osu_sb_impl::OsuSbImpl;
+use crate::database::implement::sign_impl::SignImpl;
+use crate::database::table::{BiliPush, OsuSb, Sign};
+use crate::utils::file_util::get_resources_path;
 
 extern crate rbatis;
 
@@ -43,6 +46,8 @@ pub struct BotConText{
     pub config: RcoBotConfig,
     pub rbatis:Rbatis,
     pub bili_push:BiliPushImpl,
+    pub osu_sb:OsuSbImpl,
+    pub sign:SignImpl,
 }
 
 impl Default for BotConText{
@@ -53,17 +58,30 @@ impl Default for BotConText{
             rbatis: database::init_rbatis(&config),
             config,
             bili_push: BiliPushImpl {},
+            osu_sb: OsuSbImpl {},
+            sign: SignImpl {},
         }
     }
 }
 
 impl BotConText {
     pub async fn init_pool(&self) {
-        self.rbatis.init(SqliteDriver {}, "./resources/bot.db") .unwrap();
-        let mut s = SqliteTableSync::default();
-        s.sql_id = " PRIMARY KEY AUTOINCREMENT NOT NULL ".to_string();
-        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush::default()), "bili_push")
-            .await
-            .unwrap();
+        let path = get_resources_path(vec!["data", "bot.db"]);
+        tracing::debug!("{}", &path);
+        self.rbatis.init(SqliteDriver {}, path.as_str()).unwrap();
+        // let mut s = SqliteTableSync::default();
+        // s.sql_id = " PRIMARY KEY AUTOINCREMENT NOT NULL ".to_string();
+        // // bili_push
+        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush::default()), "bili_push")
+        //     .await
+        //     .unwrap();
+        // // osu_sb
+        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(OsuSb::default()), "osu_sb")
+        //     .await
+        //     .unwrap();
+        // // Sign
+        // s.sync(self.rbatis.acquire().await.unwrap(), to_value!(Sign::default()), "sign")
+        //     .await
+        //     .unwrap();
     }
 }

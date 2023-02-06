@@ -22,7 +22,7 @@ pub struct SetuConfig{
 
 impl Default for RcoBotConfig {
     fn default() -> Self {
-        let yml_data = std::fs::read_to_string("botconfig.yml")
+        let yml_data = std::fs::read_to_string("./resources/config/botconfig.yml")
             .expect("config file not found");
         let config = serde_yaml::from_str::<RcoBotConfig>(&yml_data).unwrap();
         config
