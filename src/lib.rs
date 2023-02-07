@@ -24,9 +24,10 @@ pub use error::{
     BotResult, BotError
 };
 use crate::database::implement::bili_push_impl::BiliPushImpl;
+use crate::database::implement::ett_user_impl::EttUserImpl;
 use crate::database::implement::osu_sb_impl::OsuSbImpl;
 use crate::database::implement::sign_impl::SignImpl;
-use crate::database::table::{BiliPush, OsuSb, Sign};
+use crate::database::table::{BiliPush, EttUser, OsuSb, Sign};
 use crate::utils::file_util::get_resources_path;
 
 extern crate rbatis;
@@ -48,18 +49,19 @@ pub struct BotConText{
     pub bili_push:BiliPushImpl,
     pub osu_sb:OsuSbImpl,
     pub sign:SignImpl,
+    pub ett:EttUserImpl,
 }
 
 impl Default for BotConText{
     fn default() -> Self {
         let config = RcoBotConfig::default();
-
         Self{
             rbatis: database::init_rbatis(&config),
             config,
             bili_push: BiliPushImpl {},
             osu_sb: OsuSbImpl {},
             sign: SignImpl {},
+            ett: EttUserImpl {},
         }
     }
 }
@@ -81,6 +83,10 @@ impl BotConText {
             .unwrap();
         // Sign
         s.sync(self.rbatis.acquire().await.unwrap(), to_value!(Sign::default()), "sign")
+            .await
+            .unwrap();
+        // EttUser
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(EttUser::default()), "ett_user")
             .await
             .unwrap();
     }

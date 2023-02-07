@@ -9,7 +9,7 @@ use crate::msg_util::text;
 use crate::utils::file_util::file_tmp_random_image_path;
 use std::io::{BufReader, Cursor, Read};
 use image::ImageFormat;
-use crate::utils::image::MSYHBD;
+use crate::utils::image::{file_to_image, MSYHBD};
 
 pub fn help_module_image(help:&Vec<String>) -> BotResult<Vec<u8>>{
     let mut writer = OGImageWriter::new(style::WindowStyle {
@@ -42,10 +42,3 @@ pub fn help_module_image(help:&Vec<String>) -> BotResult<Vec<u8>>{
     Ok(vec)
 }
 
-
-fn file_to_image(path:String) ->BotResult<Vec<u8>>{
-    let mut f = std::fs::File::open(path).map_err(RQError::IO)?;
-    let mut b = vec![];
-    f.read_to_end(&mut b).map_err(RQError::IO)?;
-    Ok(b)
-}

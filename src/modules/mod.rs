@@ -4,6 +4,7 @@ use proc_qq::{event, MessageChainParseTrait, MessageChainPointTrait, MessageCont
 use std::sync::Arc;
 use crate::BotResult;
 use crate::modules::entertainment::sign::SignHelp;
+use crate::modules::ett::EttHelp;
 use crate::modules::h::setu::SetuHelp;
 use crate::msg_util::{MessageChain, text};
 use crate::utils::image::help_image_util::help_module_image;
@@ -14,6 +15,7 @@ mod h;
 mod tools;
 mod osu;
 mod entertainment;
+mod ett;
 
 static MODULES: Lazy<Arc<Vec<Module>>> =
     Lazy::new(|| Arc::new(vec![
@@ -21,6 +23,7 @@ static MODULES: Lazy<Arc<Vec<Module>>> =
         forwarding::bili::module(),
         entertainment::sign::module(),
         help_module(),
+        ett::ett_user_info::module()
     ]));
 pub fn all_modules() -> Arc<Vec<Module>> {
     MODULES.clone()
@@ -35,14 +38,17 @@ struct Help{
 enum HelpEnum{
     Setu(SetuHelp),
     Sign(SignHelp),
+    Ett(EttHelp),
 }
 impl Default for Help {
     fn default() -> Self {
         let mut map = HashMap::new();
         let setu = SetuHelp::default();
         let sign = SignHelp::default();
+        let ett = EttHelp::default();
         map.insert(setu.mod_name.clone(),HelpEnum::Setu(setu));
         map.insert(sign.mod_name.clone(),HelpEnum::Sign(sign));
+        map.insert(ett.mod_name.clone(),HelpEnum::Ett(ett));
         Self{
             help: map,
         }
@@ -65,6 +71,9 @@ async fn help(event: &MessageEvent) -> anyhow::Result<bool> {
                     }
                     HelpEnum::Sign(sign) => {
                         help_module_image(&sign.help_text)
+                    }
+                    HelpEnum::Ett(ett) => {
+                        help_module_image(&ett.help_text)
                     }
                 };
                 match result {

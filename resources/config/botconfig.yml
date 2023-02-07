@@ -6,7 +6,13 @@ login_type: "uin_pwd"
 account:
   uin:
   pwd: ""
-
+ett:
+  uin: ""
+  pwd: ""
+  # 冷却时间 单位: 秒
+  cooldown: 2
+  #api 超时时间 单位: 秒
+  timeout:
 setu:
   # 色图自动撤回时间 单位: 秒
   recall_time: 60

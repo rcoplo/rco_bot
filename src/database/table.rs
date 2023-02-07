@@ -45,3 +45,11 @@ pub struct OsuSb{
     pub user_id_qq:i64,
     pub mode:String
 }
+#[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
+pub struct EttUser{
+    pub id:i32,
+    pub user_name:String,
+    pub user_id_qq:i64,
+    pub rating:String,
+    pub custom_background:String,
+}

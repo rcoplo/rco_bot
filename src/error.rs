@@ -84,13 +84,39 @@ impl From<og_image_writer::Error> for BotError {
         BotError::MsgChain(arg.to_string().parse_message_chain())
     }
 }
-impl From<proc_qq::re_exports::ricq_core::RQError> for BotError {
-    fn from(arg:proc_qq::re_exports::ricq_core::RQError) -> Self {
+
+impl From<etternaonline_api::Error> for BotError {
+    fn from(arg: etternaonline_api::Error) -> Self {
         BotError::MsgChain(arg.to_string().parse_message_chain())
     }
 }
+
 impl From<image::error::ImageError> for BotError {
-    fn from(arg:image::error::ImageError) -> Self {
+    fn from(arg: image::error::ImageError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<rosu_v2::error::ApiError> for BotError {
+    fn from(arg: rosu_v2::error::ApiError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<rosu_v2::error::OsuError> for BotError {
+    fn from(arg: rosu_v2::error::OsuError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<rosu_v2::error::ParsingError> for BotError {
+    fn from(arg: rosu_v2::error::ParsingError) -> Self {
+        BotError::MsgChain(arg.to_string().parse_message_chain())
+    }
+}
+
+impl From<proc_qq::re_exports::ricq_core::RQError> for BotError {
+    fn from(arg:proc_qq::re_exports::ricq_core::RQError) -> Self {
         BotError::MsgChain(arg.to_string().parse_message_chain())
     }
 }

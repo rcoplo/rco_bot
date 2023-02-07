@@ -4,6 +4,7 @@ pub struct RcoBotConfig {
     pub chrome_driver_url: String,
     pub login_type:String,
     pub account:Account,
+    pub ett:EttConfig,
     pub setu:SetuConfig,
     pub super_admin:Vec<String>,
     pub bot_name:Vec<String>,
@@ -12,6 +13,13 @@ pub struct RcoBotConfig {
 pub struct Account {
     pub uin:i64,
     pub pwd:String,
+}
+#[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
+pub struct EttConfig {
+    pub uin:String,
+    pub pwd:String,
+    pub cooldown: Option<i32>,
+    pub timeout: Option<i32>,
 }
 
 #[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
