@@ -17,7 +17,7 @@ impl SignImpl {
             sign_time:* sign_time,
             ..sign.clone()
         };
-        Sign::update_by_column(pool!(),&sign,"user_id").await?;
+        Sign::update_by_column(pool!(), &sign, "id").await?;
         Ok(true)
     }
 

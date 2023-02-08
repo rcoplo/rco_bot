@@ -32,7 +32,6 @@ use crate::utils::file_util::get_resources_path;
 
 extern crate rbatis;
 
-
 pub static CONTEXT: Lazy<BotConText> = Lazy::new(||{BotConText::default()});
 
 
@@ -74,19 +73,32 @@ impl BotConText {
         let mut s = SqliteTableSync::default();
         s.sql_id = " PRIMARY KEY AUTOINCREMENT NOT NULL ".to_string();
         // bili_push
-        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush::default()), "bili_push")
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(BiliPush{
+                id:Some(0),
+                ..Default::default()
+        }), "bili_push")
             .await
             .unwrap();
         // osu_sb
-        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(OsuSb::default()), "osu_sb")
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(OsuSb{
+             id:Some(0),
+                ..Default::default()
+        }), "osu_sb")
             .await
             .unwrap();
         // Sign
-        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(Sign::default()), "sign")
+        s.sync(self.rbatis.acquire().await.unwrap(),
+               to_value!(Sign{
+                id:Some(0),
+                ..Default::default()
+            }), "sign")
             .await
             .unwrap();
         // EttUser
-        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(EttUser::default()), "ett_user")
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(EttUser{
+                id:Some(0),
+                ..Default::default()
+        }), "ett_user")
             .await
             .unwrap();
     }

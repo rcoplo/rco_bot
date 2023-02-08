@@ -29,29 +29,21 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
     let reg_untie = Reg::ex(&content, &["/ett[\\s]+untie $"], None);
     let reg_info = Reg::ex(&content, &["/ett[\\s]+info $"], None);
     let (reg_info_name,msg_array_info_name) = Reg::ex_msg(&content, &["/ett[\\s]+info[\\s]+(.*)"], None);
-    let ett_user = CONTEXT.ett.ett_select_by_name_qq(&event.from_uin()).await;
+
     if reg_build {
-        return match ett_user {
-            Ok(ett_user) => {
-                event.send_message_to_source(format!("你已经绑定了一位叫 {} 的用户,解绑请使用 /ett untie", ett_user.user_name).parse_message_chain()).await?;
+        return match CONTEXT.ett.ett_build_by_name_qq(&msg_array_build[2], &&event.from_uin()).await {
+            Ok(_) => {
+                event.send_message_to_source("绑定成功喵!".parse_message_chain()).await?;
                 Ok(true)
             }
-            Err(_) => {
-                match CONTEXT.ett.ett_build_by_name_qq(&msg_array_build[2], &&event.from_uin()).await {
-                    Ok(_) => {
-                        event.send_message_to_source("绑定成功喵!".parse_message_chain()).await?;
-                        Ok(true)
-                    }
-                    Err(err) => {
-                        event.send_message_to_source(err.to_msg()).await?;
-                        Ok(true)
-                    }
-                }
+            Err(err) => {
+                event.send_message_to_source(err.to_msg()).await?;
+                Ok(true)
             }
         }
     }
     if reg_untie {
-
+        let ett_user = CONTEXT.ett.ett_select_by_name_qq(&event.from_uin()).await;
         return match ett_user {
             Ok(ett_user) => {
                 match CONTEXT.ett.ett_untie_by_qq(&event.from_uin()).await {
@@ -72,7 +64,7 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
         }
     }
     if reg_info {
-
+        let ett_user = CONTEXT.ett.ett_select_by_name_qq(&event.from_uin()).await;
         return match ett_user {
             Ok(ett_user) => {
                  match ETT_CLIENT.as_ref() {
@@ -85,7 +77,11 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
                             Ok(data) => {
                                 tracing::debug!("{:?}",&data);
                                 let image = http_get_image(&format!("https://etternaonline.com/avatars/{}", data.avatar_url)).await?;
-                                let res =  EttUserInfoImage::new(data).ok(&image);
+                                let string = serde_json::to_string(&data.rating).unwrap_or_default();
+                                tracing::debug!("{:?}",&string);
+                                CONTEXT.ett.ett_update_rating_time_by_qq(&event.from_uin(), string, chrono::Local::now().naive_utc()).await?;
+
+                                let res = EttUserInfoImage::new(data, ett_user.rating, ett_user.update_time).ok(&image);
                                 match res {
                                     Ok(ok) => {
                                         let chain = MessageChain::new().image_vec(ok, &event).await.ok();
@@ -114,31 +110,22 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
         }
     }
     if reg_info_name {
-
-        return match ett_user {
-            Ok(ett_user) => {
-                match ETT_CLIENT.as_ref() {
-                    Err(err) => {
-                        event.send_message_to_source(format!("ett client 错误 ,请联系bot主人 Error: {}",err).parse_message_chain()).await?;
-                        Ok(true)
-                    }
-                    Ok(session) => {
-                        match session.user_details(msg_array_info_name[2].as_str()) {
-                            Ok(data) => {
-                                tracing::debug!("{:?}",&data);
-                                let image = http_get_image(&format!("https://etternaonline.com/avatars/{}", data.avatar_url)).await?;
-                                let res =  EttUserInfoImage::new(data).ok(&image);
-                                match res {
-                                    Ok(ok) => {
-                                        let chain = MessageChain::new().image_vec(ok, &event).await.ok();
-                                        event.send_message_to_source(chain).await?;
-                                        Ok(true)
-                                    }
-                                    Err(err) => {
-                                        event.send_message_to_source(err.to_string().parse_message_chain()).await?;
-                                        Ok(true)
-                                    }
-                                }
+        match ETT_CLIENT.as_ref() {
+            Err(err) => {
+                event.send_message_to_source(format!("ett client 错误 ,请联系bot主人 Error: {}", err).parse_message_chain()).await?;
+                Ok(true)
+            }
+            Ok(session) => {
+                match session.user_details(msg_array_info_name[2].as_str()) {
+                    Ok(data) => {
+                        tracing::debug!("{:?}",&data);
+                        let image = http_get_image(&format!("https://etternaonline.com/avatars/{}", data.avatar_url)).await?;
+                        let res = EttUserInfoImage::new(data, String::new(), chrono::Local::now().naive_local()).ok(&image);
+                        match res {
+                            Ok(ok) => {
+                                let chain = MessageChain::new().image_vec(ok, &event).await.ok();
+                                event.send_message_to_source(chain).await?;
+                                Ok(true)
                             }
                             Err(err) => {
                                 event.send_message_to_source(err.to_string().parse_message_chain()).await?;
@@ -146,11 +133,11 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
                             }
                         }
                     }
+                    Err(err) => {
+                        event.send_message_to_source(err.to_string().parse_message_chain()).await?;
+                        Ok(true)
+                    }
                 }
-            }
-            Err(err) => {
-                event.send_message_to_source(err.to_msg()).await?;
-                Ok(true)
             }
         }
     }

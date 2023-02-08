@@ -49,13 +49,17 @@ async fn main() -> anyhow::Result<()> {
     let client = Arc::new(client);
     let copy = client.clone();
     tokio::spawn(async move {
-        tracing::info!("{}", copy.rq_client.start_time);
+        tracing::info!("{:?}", chrono::NaiveDateTime::from_timestamp_millis(copy.rq_client.start_time.into()));
     });
     run_client(client).await?;
     Ok(())
 }
 
 fn init_tracing_subscriber() {
+    let level = match CONTEXT.config.debug {
+        true => Level::DEBUG,
+        false => Level::INFO,
+    };
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::fmt::layer()
@@ -64,11 +68,11 @@ fn init_tracing_subscriber() {
         )
         .with(
             tracing_subscriber::filter::Targets::new()
-                .with_target("ricq", Level::DEBUG)
-                .with_target("proc_qq", Level::DEBUG)
-                .with_target("rco_bot", Level::DEBUG)
-                .with_target("rbatis", Level::DEBUG)
-                .with_target("tracing", Level::DEBUG),
+                .with_target("ricq", level)
+                .with_target("proc_qq", level)
+                .with_target("rco_bot", level)
+                .with_target("rbatis", level)
+                .with_target("tracing", level),
         )
         .init();
 }
