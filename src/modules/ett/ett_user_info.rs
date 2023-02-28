@@ -81,7 +81,7 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
                                 tracing::debug!("{:?}",&string);
                                 CONTEXT.ett.ett_update_rating_time_by_qq(&event.from_uin(), string, chrono::Local::now().naive_utc()).await?;
 
-                                let res = EttUserInfoImage::new(data, ett_user.rating, ett_user.update_time).ok(&image);
+                                let res = EttUserInfoImage::new(data, Some(ett_user.rating), ett_user.update_time).ok(&image);
                                 match res {
                                     Ok(ok) => {
                                         let chain = MessageChain::new().image_vec(ok, &event).await.ok();
@@ -110,7 +110,7 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
         }
     }
     if reg_info_name {
-        match ETT_CLIENT.as_ref() {
+        return match ETT_CLIENT.as_ref() {
             Err(err) => {
                 event.send_message_to_source(format!("ett client 错误 ,请联系bot主人 Error: {}", err).parse_message_chain()).await?;
                 Ok(true)
@@ -120,7 +120,7 @@ async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
                     Ok(data) => {
                         tracing::debug!("{:?}",&data);
                         let image = http_get_image(&format!("https://etternaonline.com/avatars/{}", data.avatar_url)).await?;
-                        let res = EttUserInfoImage::new(data, String::new(), chrono::Local::now().naive_local()).ok(&image);
+                        let res = EttUserInfoImage::new(data, None, chrono::Local::now().naive_local()).ok(&image);
                         match res {
                             Ok(ok) => {
                                 let chain = MessageChain::new().image_vec(ok, &event).await.ok();

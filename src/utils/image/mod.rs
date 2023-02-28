@@ -5,6 +5,7 @@ use crate::BotResult;
 
 pub mod help_image_util;
 pub mod ett;
+pub mod emoji_make_util;
 
 
 pub static MSYHBD:&[u8] = include_bytes!("../../../resources/font/MSYHBD.TTC");

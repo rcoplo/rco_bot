@@ -94,9 +94,9 @@ impl Reg {
                 format!("{}{}", v.to_string(), k)
             })
             .collect::<Vec<_>>()
-
     }
 }
+
 impl std::fmt::Display for Reg{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::iter::Map;
+use rbatis::dark_std::err;
 use reqwest::header::HeaderMap;
 use serde_json::{Error, json, Value};
 use crate::{BotError, BotResult};
@@ -28,7 +29,6 @@ pub struct Setu {
 #[derive(Debug,Clone,serde::Serialize, serde::Deserialize)]
 pub struct ImageUrls{
     pub original:String,
-
 }
 
 async fn get(url: &str, data:Value) -> BotResult<Value>{
@@ -37,33 +37,32 @@ async fn get(url: &str, data:Value) -> BotResult<Value>{
     Ok(result)
 }
 
-pub async fn get_lolicon_list_r18(num:i8)-> BotResult<Vec<Setu>>{
-   let json =  json!(
+pub async fn get_lolicon_list_r18(num:i8)-> BotResult<Vec<Setu>> {
+    let json = json!(
        {
             "r18": 1,
             "num": num,
         }
     );
-    let data = get(URL, json).await?;
-    to_setu_list(data)
+    let setu = get(URL, json).await?;
+    to_setu_list(setu)
 }
 
-pub async fn get_lolicon_list(num:i8)-> BotResult<Vec<Setu>>{
-    let json =  json!(
+pub async fn get_lolicon_list(num:i8)-> BotResult<Vec<Setu>> {
+    let json = json!(
        {
             "r18": 0,
             "num": num,
         }
     );
-
-    let data = get(URL, json).await?;
-    to_setu_list(data)
+    let setu = get(URL, json).await?;
+    to_setu_list(setu)
 }
 
 pub async fn get_lolicon_list_tag(num:i8,tag:Vec<String>)-> BotResult<Vec<Setu>>{
     let value = Value::from(tag);
     tracing::debug!("tag = {:?}",&value);
-    let json =  json!(
+    let json = json!(
        {
             "r18": 0,
             "num": num,
@@ -71,68 +70,78 @@ pub async fn get_lolicon_list_tag(num:i8,tag:Vec<String>)-> BotResult<Vec<Setu>>
         }
     );
 
-    let data = get(URL, json).await?;
-    to_setu_list(data)
+    let setu = get(URL, json).await?;
+    to_setu_list(setu)
 }
 
-pub async fn get_lolicon_r18_tag(tag:Vec<String>)-> BotResult<Setu>{
+pub async fn get_lolicon_r18_tag(tag:Vec<String>)-> BotResult<Setu> {
     let value = Value::from(tag);
     tracing::debug!("tag = {:?}",&value);
-    let json =  json!(
+    let json = json!(
        {
             "r18": 1,
             "tag": value,
         }
     );
-    let data = get(URL, json).await?;
-    to_setu(data)
+    let setu = get(URL, json).await?;
+    to_setu(setu)
 }
 
-pub async fn get_lolicon_r18()-> BotResult<Setu>{
-    let json =  json!(
+pub async fn get_lolicon_r18()-> BotResult<Setu> {
+    let json = json!(
        {
             "r18": 1,
         }
     );
-    let data = get(URL, json).await?;
-    to_setu(data)
+    let setu = get(URL, json).await?;
+    to_setu(setu)
 }
 
-pub async fn get_lolicon()-> BotResult<Setu>{
-    let json =  json!(
+pub async fn get_lolicon()-> BotResult<Setu> {
+    let json = json!(
        {
             "r18": 0,
         }
     );
-    let data = get(URL, json).await?;
-    to_setu(data)
+    let setu = get(URL, json).await?;
+    to_setu(setu)
 }
 
-pub async fn get_lolicon_tag(tag:Vec<String>)-> BotResult<Setu>{
+pub async fn get_lolicon_tag(tag:Vec<String>)-> BotResult<Setu> {
     let value = Value::from(tag);
     tracing::debug!("tag = {:?}",&value);
-    let json =  json!(
+    let json = json!(
        {
             "r18": 0,
             "tag": value,
         }
     );
-    let data = get(URL, json).await?;
-    to_setu(data)
+    let setu = get(URL, json).await?;
+    to_setu(setu)
 }
 
 fn to_setu(data:Value)-> BotResult<Setu> {
-    let mut setu = serde_json::from_value::<Setu>(data["data"][0].clone())?;
-    setu.urls.original = setu.urls.original.replace("i.pixiv.re","pixiv.rco.ink");
-    Ok(setu)
+    match serde_json::from_value::<Setu>(data["data"][0].clone()) {
+        Ok(mut setu) => {
+            setu.urls.original = setu.urls.original.replace("i.pixiv.re", "pixiv.rco.ink");
+            Ok(setu)
+        }
+        Err(_) => Err(BotError::from("没有这种色图喵..."))
+    }
 }
 fn to_setu_list(data:Value) -> BotResult<Vec<Setu>> {
     let mut vec = vec![];
     let data = data["data"].as_array().unwrap().clone();
     for v in data {
-        let mut lolicon = serde_json::from_value::<Setu>(v)?;
-        lolicon.urls.original = lolicon.urls.original.replace("i.pixiv.re","pixiv.rco.ink");
-        vec.push(lolicon);
+        match serde_json::from_value::<Setu>(v) {
+            Ok(mut lolicon) => {
+                lolicon.urls.original = lolicon.urls.original.replace("i.pixiv.re", "pixiv.rco.ink");
+                vec.push(lolicon);
+            }
+            Err(_) => {
+                return Err(BotError::from("没有这种色图喵..."));
+            }
+        };
     }
     Ok(vec)
 }

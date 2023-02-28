@@ -22,8 +22,9 @@ static MODULES: Lazy<Arc<Vec<Module>>> =
         h::setu::module(),
         forwarding::bili::module(),
         entertainment::sign::module(),
+        entertainment::emoji_make::module(),
         help_module(),
-        ett::ett_user_info::module()
+        ett::ett_user_info::module(),
     ]));
 pub fn all_modules() -> Arc<Vec<Module>> {
     MODULES.clone()

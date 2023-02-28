@@ -12,14 +12,14 @@ use crate::utils::image::{file_to_image, MSYHBD};
 
 pub struct EttUserInfoImage {
     user_data: UserDetails,
-    info_history_record: String,
+    info_history_record: Option<String>,
     time: NaiveDateTime,
     image_writer: OGImageWriter,
 }
 
 
 impl EttUserInfoImage {
-    pub fn new(user_data: UserDetails, info_history_record: String, time: NaiveDateTime) -> Self {
+    pub fn new(user_data: UserDetails, info_history_record: Option<String>, time: NaiveDateTime) -> Self {
         Self {
             user_data,
             info_history_record,
@@ -67,12 +67,27 @@ impl EttUserInfoImage {
                 ..style::Style::default()
             },
         )?;
-        let v = serde_json::from_str::<serde_json::Value>(self.info_history_record.as_str()).unwrap_or_default();
-        //设置 player_rating
-        let mut rating_ = 0.00;
-        if self.user_data.player_rating > (v["overall"].as_f64().unwrap_or(0.00) as f32) {
-            rating_ = self.user_data.player_rating - v["overall"].as_f64().unwrap_or(0.00) as f32
-        } else if self.user_data.player_rating == (v["overall"].as_f64().unwrap_or(0.00) as f32) {}
+        let v = serde_json::from_str::<serde_json::Value>(self.info_history_record.clone().unwrap_or_default().as_str()).unwrap_or_default();
+        if self.info_history_record.is_some() {
+
+            //设置 player_rating
+            let mut rating_ = 0.00;
+            if self.user_data.player_rating > (v["overall"].as_f64().unwrap_or(0.00) as f32) {
+                rating_ = self.user_data.player_rating - v["overall"].as_f64().unwrap_or(0.00) as f32
+            } else if self.user_data.player_rating == (v["overall"].as_f64().unwrap_or(0.00) as f32) {}
+            self.image_writer.set_text(
+                format!("(+{rating_:.2})").as_str(),
+                style::Style {
+                    margin: style::Margin(500, 0, 0, 1100),
+                    position: style::Position::Absolute,
+                    color: style::Rgba([255, 0, 0, 255]),
+                    font_size: 60.,
+                    ..style::Style::default()
+                },
+                Some(Vec::from(MSYHBD)),
+            )?;
+        }
+
         self.image_writer.set_text(
             format!("{:.2}", self.user_data.player_rating).as_str(),
             style::Style {
@@ -84,17 +99,7 @@ impl EttUserInfoImage {
             },
             Some(Vec::from(MSYHBD)),
         )?;
-        self.image_writer.set_text(
-            format!("(+{rating_:.2})").as_str(),
-            style::Style {
-                margin: style::Margin(500, 0, 0, 1100),
-                position: style::Position::Absolute,
-                color: style::Rgba([255, 0, 0, 255]),
-                font_size: 60.,
-                ..style::Style::default()
-            },
-            Some(Vec::from(MSYHBD)),
-        )?;
+
         self.image_writer.set_text(
             "overall",
             style::Style {
@@ -182,7 +187,7 @@ impl EttUserInfoImage {
             let mut rating_ = 0.00;
             if rating > &(history_rating.unwrap_or(0.00) as f32) {
                 rating_ = rating - history_rating.unwrap_or(0.00) as f32
-            }
+            } else if rating == &(history_rating.unwrap_or(0.00) as f32) {}
 
             if rating_w < 70 {
                 rating_w = rating_w + 70;
@@ -208,17 +213,20 @@ impl EttUserInfoImage {
                 },
                 Some(Vec::from(MSYHBD)),
             )?;
-            stream.set_text(
-                format!(" (+{rating_:.2})", ).as_str(),
-                style::Style {
-                    color: style::Rgba([0, 0, 0, 255]),
-                    font_size: 25.,
-                    text_align: style::TextAlign::End,
-                    word_break: style::WordBreak::Normal,
-                    ..style::Style::default()
-                },
-                Some(Vec::from(MSYHBD)),
-            )?;
+            if self.info_history_record.is_some() {
+                stream.set_text(
+                    format!(" (+{rating_:.2})", ).as_str(),
+                    style::Style {
+                        color: style::Rgba([0, 0, 0, 255]),
+                        font_size: 25.,
+                        text_align: style::TextAlign::End,
+                        word_break: style::WordBreak::Normal,
+                        ..style::Style::default()
+                    },
+                    Some(Vec::from(MSYHBD)),
+                )?;
+            }
+
             self.image_writer.set_container(
                 &mut stream,
                 style::Style {
