@@ -49,10 +49,9 @@ pub(crate) fn module() -> Module {
     )
 }
 
-
 #[event]
 async fn setu(event: &MessageEvent) -> anyhow::Result<bool> {
-    if Reg::ex(&event.message_content(), &["色图 $", "涩图 $"], Some(&[Reg::All])) {
+    if Reg::ex(event.message_content().as_str(), &["色图 $", "涩图 $"], Some(&[Reg::All])) {
         let setu = get_lolicon().await;
         match setu {
             Err(err) => {
@@ -92,7 +91,7 @@ async fn setu(event: &MessageEvent) -> anyhow::Result<bool> {
 #[event]
 async fn setu_tag(event: &MessageEvent)-> anyhow::Result<bool> {
     let content = event.message_content();
-    let (bool, mut msg_array) = Reg::ex_msg(&content, &["色图[\\s]+(.*)", "涩图[\\s]+(.*)"], Some(&[Reg::All]));
+    let (bool, mut msg_array) = Reg::ex_msg(content.as_str(), &["色图[\\s]+(.*)", "涩图[\\s]+(.*)"], Some(&[Reg::All]));
     if bool {
         msg_array.remove(0);
         let setu = get_lolicon_tag(msg_array).await;
@@ -135,7 +134,7 @@ async fn setu_tag(event: &MessageEvent)-> anyhow::Result<bool> {
 #[event]
 async fn setu_list(event: &MessageEvent)-> anyhow::Result<bool> {
     let content = event.message_content();
-    let (bool, mut msg_array) = Reg::ex_msg(&content, &["色图#([1-9]*|10|20) $", "涩图#([1-9]*|10|20) $"], Some(&[Reg::All]));
+    let (bool, mut msg_array) = Reg::ex_msg(content.as_str(), &["色图#([1-9]*|10|20) $", "涩图#([1-9]*|10|20) $"], Some(&[Reg::All]));
     if bool {
         let vec = msg_array[0].split("#").collect::<Vec<_>>();
         let num = match vec[1].parse::<i8>(){
@@ -185,7 +184,7 @@ async fn setu_list(event: &MessageEvent)-> anyhow::Result<bool> {
             }
         }
     }
-    let (bool, mut msg_array) = Reg::ex_msg(&content, &["色图(sep)#([1-9]*|10|20)$", "涩图(sep)#([1-9]*|10|20)$"], Some(&[Reg::All]));
+    let (bool, mut msg_array) = Reg::ex_msg(content.as_str(), &["色图(sep)#([1-9]*|10|20)$", "涩图(sep)#([1-9]*|10|20)$"], Some(&[Reg::All]));
     if bool {
         let vec = msg_array[0].split("#").collect::<Vec<_>>();
         let num = match vec[1].parse::<i8>(){
@@ -236,7 +235,7 @@ async fn setu_list(event: &MessageEvent)-> anyhow::Result<bool> {
 #[event]
 async fn setu_list_tag(event: &MessageEvent)-> anyhow::Result<bool> {
     let content = event.message_content();
-    let (bool, mut msg_array) = Reg::ex_msg(&content, &["色图#([1-9]*|10|20)[\\s+](.*)", "涩图#([1-9]*|10|20)[\\s+](.*)"], Some(&[Reg::All]));
+    let (bool, mut msg_array) = Reg::ex_msg(content.as_str(), &["色图#([1-9]*|10|20)[\\s+](.*)", "涩图#([1-9]*|10|20)[\\s+](.*)"], Some(&[Reg::All]));
     if bool {
         let vec = msg_array[0].split("#").collect::<Vec<_>>();
         let num = match vec[1].parse::<i8>(){
@@ -286,7 +285,7 @@ async fn setu_list_tag(event: &MessageEvent)-> anyhow::Result<bool> {
             }
         }
     }
-    let (bool, mut msg_array) = Reg::ex_msg(&content, &["色图(sep)#([1-9]*|10|20)[\\s+](.*)", "涩图(sep)#([1-9]*|10|20)[\\s+](.*)"], Some(&[Reg::All]));
+    let (bool, mut msg_array) = Reg::ex_msg(content.as_str(), &["色图(sep)#([1-9]*|10|20)[\\s+](.*)", "涩图(sep)#([1-9]*|10|20)[\\s+](.*)"], Some(&[Reg::All]));
     if bool {
         let vec = msg_array[0].split("#").collect::<Vec<_>>();
         let num = match vec[1].parse::<i8>(){

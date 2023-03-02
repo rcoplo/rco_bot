@@ -25,10 +25,10 @@ pub(crate) fn module() -> Module {
 #[event]
 async fn ett_user_info_handle(event: &MessageEvent) -> anyhow::Result<bool>{
     let content = event.message_content();
-    let (reg_build,msg_array_build) = Reg::ex_msg(&content, &["/ett[\\s]+build[\\s]+(.*)"], None);
-    let reg_untie = Reg::ex(&content, &["/ett[\\s]+untie $"], None);
-    let reg_info = Reg::ex(&content, &["/ett[\\s]+info $"], None);
-    let (reg_info_name,msg_array_info_name) = Reg::ex_msg(&content, &["/ett[\\s]+info[\\s]+(.*)"], None);
+    let (reg_build, msg_array_build) = Reg::ex_msg(content.as_str(), &["/ett[\\s]+build[\\s]+(.*)"], None);
+    let reg_untie = Reg::ex(content.as_str(), &["/ett[\\s]+untie $"], None);
+    let reg_info = Reg::ex(content.as_str(), &["/ett[\\s]+info $"], None);
+    let (reg_info_name, msg_array_info_name) = Reg::ex_msg(content.as_str(), &["/ett[\\s]+info[\\s]+(.*)"], None);
 
     if reg_build {
         return match CONTEXT.ett.ett_build_by_name_qq(&msg_array_build[2], &&event.from_uin()).await {

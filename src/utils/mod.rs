@@ -45,28 +45,28 @@ impl Reg {
         exp.is_match(format!("{}",name).as_str())
     }
 
-    pub fn ex(content:&String,command:&[&str],prefix:Option<&[Reg]>) -> bool {
+    pub fn ex(content: &str, command: &[&str], prefix: Option<&[Reg]>) -> bool {
         match prefix {
             None => {
                 let exp = RegexSet::new(command).unwrap();
-                exp.is_match(content.as_str())
+                exp.is_match(content)
             },
             Some(prefix) => {
                 //把前缀添加到命令前面
 
-                let mut vec = Reg::command_assembly(command,prefix);
+                let mut vec = Reg::command_assembly(command, prefix);
                 let exp = RegexSet::new(&vec).unwrap();
-                exp.is_match(content.as_str())
+                exp.is_match(content)
             }
         }
     }
-    pub fn ex_msg(content:&String,command:&[&str],prefix:Option<&[Reg]>) -> (bool,Vec<String>) {
+    pub fn ex_msg(content: &str, command: &[&str], prefix: Option<&[Reg]>) -> (bool, Vec<String>) {
         let mut param = content
             .split_whitespace()
-            .filter_map(|str|{
-                if str.eq(" "){
+            .filter_map(|str| {
+                if str.eq(" ") {
                     None
-                }else {
+                } else {
                     Some(str.to_string())
                 }
             })
@@ -74,13 +74,13 @@ impl Reg {
         match prefix {
             None => {
                 let exp = RegexSet::new(command).unwrap();
-                (exp.is_match(content.as_str()), param)
+                (exp.is_match(content), param)
             },
             Some(prefix) => {
                 //把前缀添加到命令前面
                 let mut vec = Reg::command_assembly(command,prefix);
                 let exp = RegexSet::new(&vec).unwrap();
-                (exp.is_match(content.as_str()),param)
+                (exp.is_match(content), param)
             }
         }
     }

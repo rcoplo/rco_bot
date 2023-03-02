@@ -32,17 +32,17 @@ pub fn module() -> Module{
 #[event]
 async fn bili_push_all(event:&GroupMessageEvent)-> anyhow::Result<bool>{
     let content = event.message_content();
-    if Reg::ex(&content, &["/关注[\\s]*[0-9]*"], None) {
-        bili_push_concern(&event,&content).await?;
+    if Reg::ex(content.as_str(), &["/关注[\\s]*[0-9]*"], None) {
+        bili_push_concern(&event, &content).await?;
         return Ok(true);
-    } else if Reg::ex(&content,&["/取消关注[\\s]*[0-9]*"],None){
-        bili_push_delete(&event,&content).await?;
+    } else if Reg::ex(content.as_str(), &["/取消关注[\\s]*[0-9]*"], None) {
+        bili_push_delete(&event, &content).await?;
         return Ok(true);
-    } else if Reg::ex(&content,&["/查看关注列表"],None){
+    } else if Reg::ex(content.as_str(), &["/查看关注列表"], None) {
         bili_push_select_all(&event).await?;
         return Ok(true);
-    } else if Reg::ex(&content,&["/查看关注[\\s]*[0-9]*"],None){
-        bili_push_select(&event,&content).await?;
+    } else if Reg::ex(content.as_str(), &["/查看关注[\\s]*[0-9]*"], None) {
+        bili_push_select(&event, &content).await?;
         return Ok(true);
     }
     Ok(false)
@@ -117,9 +117,7 @@ async fn bili_push_delete(event:&GroupMessageEvent,content:&String) -> anyhow::R
 #[event]
 async fn bili_push_update_push(event:&GroupMessageEvent) -> anyhow::Result<bool>{
     let content = event.message_content();
-        if Reg::ex(&content,&["/test"],None){
-
-        }
+    if Reg::ex(content.as_str(), &["/test"], None) {}
     Ok(false)
 }
 

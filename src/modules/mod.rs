@@ -58,11 +58,11 @@ impl Default for Help {
 #[event]
 async fn help(event: &MessageEvent) -> anyhow::Result<bool> {
     let content = event.message_content();
-    if Reg::ex(&content, &["help $"], Some(&[Reg::All])) {
+    if Reg::ex(content.as_str(), &["help $"], Some(&[Reg::All])) {
         event.send_message_to_source(text("暂未完成")).await?;
         return Ok(true);
     } else {
-        let (bool,msg_array) = Reg::ex_msg(&content, &["help[\\s]+(.*)"], Some(&[Reg::All]));
+        let (bool, msg_array) = Reg::ex_msg(content.as_str(), &["help[\\s]+(.*)"], Some(&[Reg::All]));
         if bool {
             let help = MODULES_HELP.help.get(msg_array[1].as_str());
             return if help.is_some() {

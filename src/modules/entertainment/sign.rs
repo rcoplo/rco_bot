@@ -40,7 +40,7 @@ impl Default for SignHelp{
 #[event]
 async fn sign(event:&GroupMessageEvent) -> anyhow::Result<bool> {
     let content = event.message_content();
-    if Reg::ex(&content,&["小白摸+","摸+小白"],None){
+    if Reg::ex(content.as_str(), &["小白摸+", "摸+小白"], None) {
         let sign = CONTEXT.sign.select_sign(&event.inner.from_uin).await;
         let time = chrono::Local::now().naive_local();
         let mut nums: Vec<i32> = (1..100).collect();

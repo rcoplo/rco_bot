@@ -7,7 +7,7 @@ use crate::utils::file_util::{file_tmp_random_image_path, get_resources_path};
 use crate::utils::image::{file_to_image, MSYHBD};
 
 
-pub fn long1(text: &String) -> BotResult<Vec<u8>> {
+pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
     if text.chars().count() > 22 {
         return Err(BotError::from("字符最多22个喵!"));
     }
@@ -40,7 +40,7 @@ pub fn long1(text: &String) -> BotResult<Vec<u8>> {
             ..style::WindowStyle::default()
         })?;
     content.set_text(
-        text.as_str(),
+        text,
         style::Style {
             color: style::Rgba([0, 0, 0, 255]),
             font_size: 80.,

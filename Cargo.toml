@@ -38,11 +38,9 @@ async-trait = "0"
 image = "0.24.5"
 og_image_writer = "0.11.0"
 
-#浏览器截图,暂时未使用
-thirtyfour = "0"
 
 # ett api
 etternaonline_api = {version = "0.2.0", features = ["serde"]}
 
 #osu api
-rosu-v2 = "0.6.2"
+#rosu-v2 = "0.6.2"
