@@ -4846,9 +4846,9 @@ dependencies = [
     "gtk-sys",
     "javascriptcore-rs",
     "libc",
- "once_cell",
- "soup2",
- "webkit2gtk-sys",
+    "once_cell",
+    "soup2",
+    "webkit2gtk-sys",
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-use proc_qq::{event, MessageChainParseTrait, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, MessageTargetTrait, Module, module};
+use proc_qq::{event, GroupMessageEvent, MessageChainParseTrait, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, MessageTargetTrait, Module, module};
 use proc_qq::re_exports::ricq::structs::GroupMemberPermission;
 use rbatis::dark_std::err;
 use regex::RegexSet;
@@ -50,17 +50,17 @@ pub(crate) fn module() -> Module {
 }
 
 #[event]
-async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
+async fn mc_server_status_get(event: &GroupMessageEvent) -> anyhow::Result<bool> {
     let content = event.message_content();
-    if event.is_group_message() {
-        let (mc_bool, mc_array) = Reg::ex_msg(content.as_str(), &["/mc[\\s](.*)"], None);
-        let (list_bool, list_array) = Reg::ex_msg(content.as_str(), &["/list[\\s]+(.*)"], None);
-        let group_id = event.as_group_message().unwrap().inner.group_code;
-        if Reg::ex(content.as_str(), &["/list $"], None) {
-            return match CONTEXT.mc_server.select_server_all_by_group_id(group_id).await {
-                None => {
-                    event.at_text("本群一个服务器都没绑定喵!").await?;
-                    Ok(true)
+
+    let (mc_bool, mc_array) = Reg::ex_msg(content.as_str(), &["/mc[\\s](.*)"], None);
+    let (list_bool, list_array) = Reg::ex_msg(content.as_str(), &["/list[\\s]+(.*)"], None);
+    let group_id = event.inner.group_code;
+    if Reg::ex(content.as_str(), &["/list $"], None) {
+        return match CONTEXT.mc_server.select_server_all_by_group_id(group_id).await {
+            None => {
+                event.at_text("本群一个服务器都没绑定喵!").await?;
+                Ok(true)
                 }
                 Some(vec) => {
                     if vec.len() == 0 {
@@ -109,7 +109,7 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
             };
         }
         if mc_bool {
-            let map = event.client().get_group_admin_list(group_id).await?;
+            let map = event.client.get_group_admin_list(group_id).await?;
             let mut user_array = map.iter().filter_map(|(user_id, group_permission)| {
                 match group_permission {
                     GroupMemberPermission::Owner => Some(user_id.to_string()),
@@ -178,6 +178,5 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
                 return Ok(true);
             }
         }
-    }
     Ok(false)
 }

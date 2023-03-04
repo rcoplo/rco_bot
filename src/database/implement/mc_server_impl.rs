@@ -26,7 +26,7 @@ impl McServerImpl {
     }
 
     pub async fn select_server_by_name_group_id(&self, name: &str, group_id: i64) -> Option<McServer> {
-        let mc_server = McServer::select_server_by_name(pool!(), name).await.ok()?;
+        let mc_server = McServer::select_server_by_name(pool!(), name, group_id).await.ok()?;
         mc_server
     }
 
