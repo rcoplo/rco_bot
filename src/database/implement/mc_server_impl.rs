@@ -31,14 +31,14 @@ impl McServerImpl {
     }
 
     pub async fn select_server_all_by_group_id(&self, group_id: i64) -> Option<Vec<McServer>> {
-        let mc_server = McServer::select_server_all_by_group_id(pool!(), group_id).await.ok();
+        let mc_server = McServer::select_by_column(pool!(), "group_id", group_id).await.ok();
         mc_server
     }
 
     pub async fn update_name_by_name_group_id(&self, name: &str, group_id: i64, new_name: &str) -> BotResult<()> {
         match self.select_server_by_name_group_id(name, group_id).await {
             None => {
-                Err(BotError::from("本群并没有这个服务器简称喵..."))
+                Err(BotError::from("本群并没有绑定这个服务器简称喵..."))
             }
             Some(mc_server) => {
                 McServer::update_by_column(pool!(), &McServer {
@@ -53,7 +53,7 @@ impl McServerImpl {
     pub async fn update_url_by_name_group_id(&self, name: &str, group_id: i64, new_url: &str) -> BotResult<()> {
         match self.select_server_by_name_group_id(name, group_id).await {
             None => {
-                Err(BotError::from("本群并没有这个服务器简称喵..."))
+                Err(BotError::from("本群并没有绑定这个服务器简称喵..."))
             }
             Some(mc_server) => {
                 McServer::update_by_column(pool!(), &McServer {
@@ -68,10 +68,10 @@ impl McServerImpl {
     pub async fn delete_server_by_name_group_id(&self, name: &str, group_id: i64) -> BotResult<()> {
         match self.select_server_by_name_group_id(name, group_id).await {
             None => {
-                Err(BotError::from("本群并没有这个服务器简称喵..."))
+                Err(BotError::from("本群并没有绑定这个服务器简称喵..."))
             }
             Some(mc_server) => {
-                McServer::delete_by_column(pool!(), name, "name").await?;
+                McServer::delete_by_column(pool!(), "name", mc_server.name).await?;
                 Ok(())
             }
         }

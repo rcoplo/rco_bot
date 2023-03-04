@@ -744,8 +744,8 @@ dependencies = [
     "async-trait",
     "deadpool-runtime",
     "num_cpus",
- "retain_mut",
- "tokio",
+    "retain_mut",
+    "tokio",
 ]
 
 [[package]]
@@ -1006,7 +1006,7 @@ dependencies = [
     "libc",
     "once_cell",
     "serde",
- "winapi",
+    "winapi",
 ]
 
 [[package]]
@@ -1665,14 +1665,14 @@ version = "0.14.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "034711faac9d2166cb1baf1a2fb0b60b1f277f8492fd72176c17f3515e1abd3c"
 dependencies = [
- "bytes",
- "futures-channel",
- "futures-core",
- "futures-util",
- "h2",
- "http",
- "http-body",
- "httparse",
+    "bytes",
+    "futures-channel",
+    "futures-core",
+    "futures-util",
+    "h2",
+    "http",
+    "http-body",
+    "httparse",
     "httpdate",
     "itoa 1.0.5",
     "pin-project-lite",
@@ -1707,8 +1707,8 @@ dependencies = [
     "bytes",
     "hyper",
     "native-tls",
- "tokio",
- "tokio-native-tls",
+    "tokio",
+    "tokio-native-tls",
 ]
 
 [[package]]
@@ -1958,8 +1958,8 @@ version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ea8e9c6e031377cff82ee3001dc8026cdf431ed4e2e6b51f98ab8c73484a358"
 dependencies = [
- "cssparser",
- "html5ever",
+    "cssparser",
+    "html5ever",
     "matches",
     "selectors",
 ]
@@ -3269,12 +3269,12 @@ dependencies = [
 name = "rco_bot"
 version = "0.1.0"
 dependencies = [
- "anyhow",
- "async-trait",
- "chrono",
- "etternaonline_api",
- "hex",
- "image 0.24.5",
+    "anyhow",
+    "async-trait",
+    "chrono",
+    "etternaonline_api",
+    "hex",
+    "image 0.24.5",
     "log",
     "og_image_writer",
     "once_cell",
@@ -3799,7 +3799,7 @@ dependencies = [
     "form_urlencoded",
     "itoa 1.0.5",
     "ryu",
- "serde",
+    "serde",
 ]
 
 [[package]]
@@ -4367,8 +4367,8 @@ dependencies = [
     "proc-macro-hack",
     "proc-macro2",
     "quote",
- "standback",
- "syn",
+    "standback",
+    "syn",
 ]
 
 [[package]]
@@ -4836,16 +4836,16 @@ dependencies = [
     "bitflags",
     "cairo-rs",
     "gdk",
- "gdk-sys",
- "gio",
- "gio-sys",
- "glib",
- "glib-sys",
- "gobject-sys",
- "gtk",
- "gtk-sys",
- "javascriptcore-rs",
- "libc",
+    "gdk-sys",
+    "gio",
+    "gio-sys",
+    "glib",
+    "glib-sys",
+    "gobject-sys",
+    "gtk",
+    "gtk-sys",
+    "javascriptcore-rs",
+    "libc",
  "once_cell",
  "soup2",
  "webkit2gtk-sys",

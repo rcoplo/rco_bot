@@ -28,12 +28,14 @@ impl Default for McServerStatusGetHelp {
                 "/mc add [简称] [url]",
                 "/mc upname [简称] [name]",
                 "/mc upurl [简称] [url]",
+                "/mc d [简称] ",
                 "----------------------------------------------------------------",
                 "/list      获取本群绑定服务器简称",
                 "/list [简称]         获取本群绑定的服务器在线玩家名单",
                 "/mc add [简称] [url]     在本群添加一个服务器到数据库",
                 "/mc upname [简称] [name]       修改本群绑定的服务器的简称  需要管理员或群主",
                 "/mc upurl [简称] [url]       修改本群绑定的服务器的简称 需要管理员或群主",
+                "/mc d [简称]      删除本群绑定的服务器 需要管理员或群主",
             ].iter().map(|str| str.to_string()).collect::<Vec<_>>(),
         }
     }
@@ -107,18 +109,6 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
             };
         }
         if mc_bool {
-            if mc_array[1].eq("add") {
-                return match CONTEXT.mc_server.new(mc_array[2].as_str(), mc_array[3].as_str(), group_id).await {
-                    Ok(_) => {
-                        event.at_text("服务器添加成功喵!").await?;
-                        Ok(true)
-                    }
-                    Err(err) => {
-                        event.send_message_to_source(err.to_msg()).await?;
-                        Ok(true)
-                    }
-                };
-            }
             let map = event.client().get_group_admin_list(group_id).await?;
             let mut user_array = map.iter().filter_map(|(user_id, group_permission)| {
                 match group_permission {
@@ -132,9 +122,22 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
             CONTEXT.config.super_admin.iter().for_each(|user_id| {
                 user_array.push(user_id.clone());
             });
-            if mc_array[1].eq("upname") {
-                return if RegexSet::new(&user_array).unwrap().is_match(event.from_uin().to_string().as_str()) {
-                    match CONTEXT.mc_server.update_name_by_name_group_id(mc_array[2].as_str(), group_id, mc_array[3].as_str()).await {
+            if RegexSet::new(&user_array).unwrap().is_match(event.from_uin().to_string().as_str()) {
+                if mc_array[1].eq("add") {
+                    return match CONTEXT.mc_server.new(mc_array[2].as_str(), mc_array[3].as_str(), group_id).await {
+                        Ok(_) => {
+                            event.at_text("服务器添加成功喵!").await?;
+                            Ok(true)
+                        }
+                        Err(err) => {
+                            event.send_message_to_source(err.to_msg()).await?;
+                            Ok(true)
+                        }
+                    }
+                }
+
+                if mc_array[1].eq("upname") {
+                    return match CONTEXT.mc_server.update_name_by_name_group_id(mc_array[2].as_str(), group_id, mc_array[3].as_str()).await {
                         Ok(_) => {
                             event.at_text("修改服务器简称成功喵!").await?;
                             Ok(true)
@@ -144,15 +147,10 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
                             Ok(true)
                         }
                     }
-                } else {
-                    event.at_text("你没有权限修改服务器简称喵...").await?;
-                    return Ok(true);
-                };
-            }
+                }
 
-            if mc_array[1].eq("upurl") {
-                return if RegexSet::new(&user_array).unwrap().is_match(event.from_uin().to_string().as_str()) {
-                    match CONTEXT.mc_server.update_url_by_name_group_id(mc_array[2].as_str(), group_id, mc_array[3].as_str()).await {
+                if mc_array[1].eq("upurl") {
+                    return match CONTEXT.mc_server.update_url_by_name_group_id(mc_array[2].as_str(), group_id, mc_array[3].as_str()).await {
                         Ok(_) => {
                             event.at_text("修改服务器url成功喵!").await?;
                             Ok(true)
@@ -162,10 +160,22 @@ async fn mc_server_status_get(event: &MessageEvent) -> anyhow::Result<bool> {
                             Ok(true)
                         }
                     }
-                } else {
-                    event.at_text("你没有权限修改服务器url喵...").await?;
-                    return Ok(true);
-                };
+                }
+                if mc_array[1].eq("d") {
+                    return match CONTEXT.mc_server.delete_server_by_name_group_id(mc_array[2].as_str(), group_id).await {
+                        Ok(_) => {
+                            event.at_text("删除服务器成功喵!").await?;
+                            Ok(true)
+                        }
+                        Err(err) => {
+                            event.send_message_to_source(err.to_msg()).await?;
+                            Ok(true)
+                        }
+                    }
+                }
+            } else {
+                event.at_text("你没有权限修改本群所绑定的服务器数据库喵...").await?;
+                return Ok(true);
             }
         }
     }
