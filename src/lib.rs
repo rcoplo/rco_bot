@@ -1,3 +1,4 @@
+#![feature(iter_intersperse)]
 #![allow(unused_variables)] //允许未使用的变量
 #![allow(unused_must_use)]
 
@@ -25,9 +26,10 @@ pub use error::{
 };
 use crate::database::implement::bili_push_impl::BiliPushImpl;
 use crate::database::implement::ett_user_impl::EttUserImpl;
+use crate::database::implement::mc_server_impl::McServerImpl;
 use crate::database::implement::osu_sb_impl::OsuSbImpl;
 use crate::database::implement::sign_impl::SignImpl;
-use crate::database::table::{BiliPush, EttUser, OsuSb, Sign};
+use crate::database::table::{BiliPush, EttUser, McServer, OsuSb, Sign};
 use crate::utils::file_util::get_resources_path;
 
 extern crate rbatis;
@@ -42,25 +44,27 @@ macro_rules! pool {
     };
 }
 
-pub struct BotConText{
+pub struct BotConText {
     pub config: RcoBotConfig,
-    pub rbatis:Rbatis,
-    pub bili_push:BiliPushImpl,
-    pub osu_sb:OsuSbImpl,
-    pub sign:SignImpl,
-    pub ett:EttUserImpl,
+    pub rbatis: Rbatis,
+    pub bili_push: BiliPushImpl,
+    pub osu_sb: OsuSbImpl,
+    pub sign: SignImpl,
+    pub ett: EttUserImpl,
+    pub mc_server: McServerImpl,
 }
 
 impl Default for BotConText{
     fn default() -> Self {
         let config = RcoBotConfig::default();
-        Self{
+        Self {
             rbatis: database::init_rbatis(&config),
             config,
             bili_push: BiliPushImpl {},
             osu_sb: OsuSbImpl {},
             sign: SignImpl {},
             ett: EttUserImpl {},
+            mc_server: McServerImpl {},
         }
     }
 }
@@ -99,6 +103,13 @@ impl BotConText {
                 id:Some(0),
                 ..Default::default()
         }), "ett_user")
+            .await
+            .unwrap();
+        // McStatusData
+        s.sync(self.rbatis.acquire().await.unwrap(), to_value!(McServer{
+                id:Some(0),
+                ..Default::default()
+        }), "mc_server")
             .await
             .unwrap();
     }

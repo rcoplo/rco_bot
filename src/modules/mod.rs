@@ -3,9 +3,11 @@ use once_cell::sync::Lazy;
 use proc_qq::{event, MessageChainParseTrait, MessageChainPointTrait, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, Module, module};
 use std::sync::Arc;
 use crate::BotResult;
+use crate::modules::entertainment::emoji_make::EmojiMakeHelp;
 use crate::modules::entertainment::sign::SignHelp;
 use crate::modules::ett::EttHelp;
 use crate::modules::h::setu::SetuHelp;
+use crate::modules::tools::mc_server_status_get::McServerStatusGetHelp;
 use crate::msg_util::{MessageChain, text};
 use crate::utils::image::help_image_util::help_module_image;
 use crate::utils::Reg;
@@ -25,6 +27,7 @@ static MODULES: Lazy<Arc<Vec<Module>>> =
         entertainment::emoji_make::module(),
         help_module(),
         ett::ett_user_info::module(),
+        tools::mc_server_status_get::module(),
     ]));
 pub fn all_modules() -> Arc<Vec<Module>> {
     MODULES.clone()
@@ -36,10 +39,12 @@ struct Help{
     help:HashMap<String,HelpEnum>
 }
 
-enum HelpEnum{
+enum HelpEnum {
     Setu(SetuHelp),
     Sign(SignHelp),
     Ett(EttHelp),
+    Emoji(EmojiMakeHelp),
+    McStatus(McServerStatusGetHelp),
 }
 impl Default for Help {
     fn default() -> Self {
@@ -47,10 +52,14 @@ impl Default for Help {
         let setu = SetuHelp::default();
         let sign = SignHelp::default();
         let ett = EttHelp::default();
-        map.insert(setu.mod_name.clone(),HelpEnum::Setu(setu));
-        map.insert(sign.mod_name.clone(),HelpEnum::Sign(sign));
-        map.insert(ett.mod_name.clone(),HelpEnum::Ett(ett));
-        Self{
+        let emoji = EmojiMakeHelp::default();
+        let mc_status = McServerStatusGetHelp::default();
+        map.insert(setu.mod_name.clone(), HelpEnum::Setu(setu));
+        map.insert(sign.mod_name.clone(), HelpEnum::Sign(sign));
+        map.insert(ett.mod_name.clone(), HelpEnum::Ett(ett));
+        map.insert(emoji.mod_name.clone(), HelpEnum::Emoji(emoji));
+        map.insert(mc_status.mod_name.clone(), HelpEnum::McStatus(mc_status));
+        Self {
             help: map,
         }
     }
@@ -75,6 +84,12 @@ async fn help(event: &MessageEvent) -> anyhow::Result<bool> {
                     }
                     HelpEnum::Ett(ett) => {
                         help_module_image(&ett.help_text)
+                    }
+                    HelpEnum::Emoji(emoji) => {
+                        help_module_image(&emoji.help_text)
+                    }
+                    HelpEnum::McStatus(mc_status) => {
+                        help_module_image(&mc_status.help_text)
                     }
                 };
                 match result {

@@ -2,7 +2,7 @@ use reqwest::header::HeaderMap;
 use tracing::event;
 use crate::{BotError, BotResult};
 
-pub async fn http_get(url:&String) -> BotResult<String>{
+pub async fn http_get(url: &str) -> BotResult<String> {
     let data = reqwest::get(url)
         .await?
         .text()
@@ -12,7 +12,8 @@ pub async fn http_get(url:&String) -> BotResult<String>{
         Err(err) => Err(BotError::from(err))
     }
 }
-pub async fn http_get_image(url:&String) -> BotResult<Vec<u8>>{
+
+pub async fn http_get_image(url: &str) -> BotResult<Vec<u8>> {
     let bytes = reqwest::get(url)
         .await.unwrap().error_for_status();
     match bytes {
@@ -24,9 +25,9 @@ pub async fn http_get_image(url:&String) -> BotResult<Vec<u8>>{
             Err(BotError::from(err))
         }
     }
-
 }
-pub async fn http_post_json(url:&String,json:&serde_json::Value) -> BotResult<String>{
+
+pub async fn http_post_json(url: &str, json: &serde_json::Value) -> BotResult<String> {
     let client = reqwest::Client::new();
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/json".parse().unwrap());

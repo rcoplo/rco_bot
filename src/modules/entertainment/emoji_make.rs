@@ -17,11 +17,12 @@ pub struct EmojiMakeHelp {
 impl Default for EmojiMakeHelp {
     fn default() -> Self {
         EmojiMakeHelp {
-            mod_name: "签到".to_string(),
+            mod_name: "表情制作".to_string(),
             help_text: vec![
                 "emoji_make help",
-                "code       name      图片本体",
-                "long1      ↑       ",
+                "\" .n \" 是换行",
+                "code           name        图片本体",
+                "long1          ↑           无",
             ].iter().map(|str| str.to_string()).collect::<Vec<_>>(),
         }
     }
@@ -39,18 +40,18 @@ pub(crate) fn module() -> Module {
 pub async fn emoji_make_long(event: &MessageEvent) -> anyhow::Result<bool> {
     let content = event.message_content();
     let (b, msg_array) = Reg::ex_msg(content.as_str(), &["emoji[\\s]+(.*)"], Some(&[Reg::All]));
-    let mut string = String::new();
-    if msg_array.len() > 3 {
-        for (i, str) in msg_array.iter().enumerate() {
-            if i >= 2 {
-                string.push_str(str.as_str());
-                string.push_str(" ");
-            }
-        }
-    } else {
-        string = msg_array[2].to_string()
-    }
     if b {
+        let mut string = String::new();
+        if msg_array.len() > 3 {
+            for (i, str) in msg_array.iter().enumerate() {
+                if i >= 2 {
+                    string.push_str(str.as_str());
+                    string.push_str(" ");
+                }
+            }
+        } else {
+            string = msg_array[2].to_string()
+        }
         if msg_array[1].eq("long1") {
             let result = long1_emoji_make_image(string.as_str());
             return match result {

@@ -32,7 +32,7 @@ pub struct ImageUrls{
 }
 
 async fn get(url: &str, data:Value) -> BotResult<Value>{
-    let result = http_post_json(&url.to_string(), &data).await?;
+    let result = http_post_json(url, &data).await?;
     let result = serde_json::from_str::<Value>(result.as_str())?;
     Ok(result)
 }

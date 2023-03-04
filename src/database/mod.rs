@@ -16,3 +16,7 @@ pub fn init_rbatis(config: &RcoBotConfig) -> Rbatis {
     return rbatis;
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct GroupVec {
+    group_id: Vec<i64>,
+}

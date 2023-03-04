@@ -44,7 +44,7 @@ pub struct OsuSb {
     pub user_id_qq: i64,
     pub mode: String,
 }
-#[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
+#[derive(Debug, Clone, Default, serde::Deserialize, serde::Serialize)]
 pub struct EttUser {
     pub id: Option<i32>,
     pub user_name: String,
@@ -52,4 +52,12 @@ pub struct EttUser {
     pub update_time: NaiveDateTime,
     pub rating: String,
     pub custom_background: String,
+}
+
+#[derive(Debug, Clone, Default, serde::Deserialize, serde::Serialize)]
+pub struct McServer {
+    pub id: Option<i32>,
+    pub group_id: i64,
+    pub name: String,
+    pub url: String,
 }

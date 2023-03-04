@@ -91,7 +91,7 @@ impl Reg {
             .iter()
             .zip(prefix.iter())
             .map(|(k,v)|{
-                format!("{}{}", v.to_string(), k)
+                format!("^{}{}", v.to_string(), k)
             })
             .collect::<Vec<_>>()
     }
