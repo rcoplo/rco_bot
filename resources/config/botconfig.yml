@@ -1,4 +1,4 @@
-debug: false
+debug: true
 chrome_driver_url: "http://localhost:9515"
 # QQ的账号密码
 #登录方式,如果qq号有验证可以先设置为 qr_code 扫描登录后,再设置为 uin_pwd 账号密码登录
@@ -18,7 +18,8 @@ setu:
   recall_time: 60
   # 色图是否保存本地
   whether_to_save_locally: false
-
+  # https://apexlegendsapi.com/#introduction
+apex_api: ""
 # 最高权限管理 高过 群主/管理员
 super_admin:
   - 2939599299
