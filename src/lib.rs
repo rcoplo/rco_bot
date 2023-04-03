@@ -1,36 +1,37 @@
 #![feature(iter_intersperse)]
 #![allow(unused_variables)] //允许未使用的变量
 #![allow(unused_must_use)]
-
+#![feature(const_trait_impl)]
 pub mod modules;
 pub mod database;
 mod config;
 mod utils;
 mod api;
 mod error;
+pub mod basic_modules;
 
 use once_cell::sync::Lazy;
+use proc_qq::re_exports::tracing;
 use rbatis::{Error, log, Rbatis};
 use rbatis::executor::RbatisRef;
 use rbatis::table_sync::{SqliteTableSync, TableSync};
 use rbdc_sqlite::driver::SqliteDriver;
 use rbs::to_value;
-use tracing_subscriber::util::SubscriberInitExt;
 pub use config::*;
 pub use config::*;
 pub use utils::{
-    msg_util,chrome_util
+    msg_util
 };
 pub use error::{
     BotResult, BotError
 };
+
 use crate::database::implement::bili_push_impl::BiliPushImpl;
 use crate::database::implement::ett_user_impl::EttUserImpl;
 use crate::database::implement::mc_server_impl::McServerImpl;
 use crate::database::implement::osu_sb_impl::OsuSbImpl;
 use crate::database::implement::sign_impl::SignImpl;
 use crate::database::table::{BiliPush, EttUser, McServer, OsuSb, Sign};
-use crate::utils::file_util::get_resources_path;
 
 extern crate rbatis;
 
@@ -71,7 +72,7 @@ impl Default for BotConText{
 
 impl BotConText {
     pub async fn init_pool(&self) {
-        let path = get_resources_path(vec!["data", "bot.db"]);
+        let path = resource_path!("data" =>"bot.db").unwrap_or_default();
         tracing::debug!("{}", &path);
         self.rbatis.init(SqliteDriver {}, path.as_str()).unwrap();
         let mut s = SqliteTableSync::default();
@@ -105,7 +106,7 @@ impl BotConText {
         }), "ett_user")
             .await
             .unwrap();
-        // McStatusData
+        // mc_server
         s.sync(self.rbatis.acquire().await.unwrap(), to_value!(McServer{
                 id:Some(0),
                 ..Default::default()

@@ -1,12 +1,11 @@
-use proc_qq::{event, GroupMessageEvent, MessageChainParseTrait, MessageChainPointTrait, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, Module, module};
-use serde_json::Value;
+use proc_qq::{event, GroupMessageEvent, MessageChainParseTrait, MessageContentTrait, MessageSendToSourceTrait, Module, module};
+use proc_qq::re_exports::{anyhow, serde_json};
 
-use crate::{BotError, BotResult, CONTEXT};
+use crate::{BotError, CONTEXT};
 use crate::api::bili_api::BiliApi;
-use crate::chrome_util::{bili_dynamic_screenshot, bili_video_screenshot};
 use crate::database::table::BiliPush;
 use crate::msg_util::MessageChain;
-use crate::utils::Reg;
+
 
 static ID: &'static str = "bili_push";
 static NAME: &'static str = "bili推送";
@@ -30,21 +29,21 @@ pub fn module() -> Module{
     )
 }
 #[event]
-async fn bili_push_all(event:&GroupMessageEvent)-> anyhow::Result<bool>{
-    let content = event.message_content();
-    if Reg::ex(content.as_str(), &["/关注[\\s]*[0-9]*"], None) {
-        bili_push_concern(&event, &content).await?;
-        return Ok(true);
-    } else if Reg::ex(content.as_str(), &["/取消关注[\\s]*[0-9]*"], None) {
-        bili_push_delete(&event, &content).await?;
-        return Ok(true);
-    } else if Reg::ex(content.as_str(), &["/查看关注列表"], None) {
-        bili_push_select_all(&event).await?;
-        return Ok(true);
-    } else if Reg::ex(content.as_str(), &["/查看关注[\\s]*[0-9]*"], None) {
-        bili_push_select(&event, &content).await?;
-        return Ok(true);
-    }
+async fn bili_push_all(event:&GroupMessageEvent)-> anyhow::Result<bool> {
+    // let content = event.message_content();
+    // if Reg::ex(content.as_str(), &["/关注[\\s]*[0-9]*"], None) {
+    //     bili_push_concern(&event, &content).await?;
+    //     return Ok(true);
+    // } else if Reg::ex(content.as_str(), &["/取消关注[\\s]*[0-9]*"], None) {
+    //     bili_push_delete(&event, &content).await?;
+    //     return Ok(true);
+    // } else if Reg::ex(content.as_str(), &["/查看关注列表"], None) {
+    //     bili_push_select_all(&event).await?;
+    //     return Ok(true);
+    // } else if Reg::ex(content.as_str(), &["/查看关注[\\s]*[0-9]*"], None) {
+    //     bili_push_select(&event, &content).await?;
+    //     return Ok(true);
+    // }
     Ok(false)
 }
 
@@ -117,7 +116,7 @@ async fn bili_push_delete(event:&GroupMessageEvent,content:&String) -> anyhow::R
 #[event]
 async fn bili_push_update_push(event:&GroupMessageEvent) -> anyhow::Result<bool>{
     let content = event.message_content();
-    if Reg::ex(content.as_str(), &["/test"], None) {}
+    // if Reg::ex(content.as_str(), &["/test"], None) {}
     Ok(false)
 }
 
@@ -130,7 +129,7 @@ async fn bili_push_select_all(event:&GroupMessageEvent) -> anyhow::Result<bool>{
             for (uid, uname) in data {
                 chain.text(format!("{}({}) \n", uname, uid));
             }
-            event.send_message_to_source(chain.ok()).await?;
+            event.send_message_to_source(chain.build()).await?;
             Ok(true)
         }
         Err(err) => {
@@ -151,7 +150,7 @@ async fn bili_push_select(event:&GroupMessageEvent,content:&String) -> anyhow::R
                     chain.text(format!("动态推送: {}\n", switch(&dy)));
                     chain.text(format!("视频推送: {}\n", switch(&v)));
                     chain.text(format!("直播推送: {}\n", switch(&l)));
-                    event.send_message_to_source(chain.ok()).await?;
+                    event.send_message_to_source(chain.build()).await?;
                     Ok(true)
                 }
                 Err(err) => {

@@ -1,10 +1,4 @@
-/*
- * @Author: RCOPLO
- * @Date: 2023-01-25 15:47:04
- * @LastEditors: RCOPLO
- * @LastEditTime: 2023-01-31 00:20:09
- * @FilePath: \RcoBot\src\api\bili_api.rs
- */
+use proc_qq::re_exports::serde_json;
 use crate::utils::http_util::http_get;
 
 static BILI_LIVE: &'static str = "https://api.live.bilibili.com/room/v1/Room/get_info";

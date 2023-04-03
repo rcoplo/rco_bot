@@ -1,16 +1,12 @@
-use std::str::FromStr;
+
 use og_image_writer::{style};
-use og_image_writer::img::ImageInputFormat;
 use og_image_writer::writer::OGImageWriter;
-use tokio::io::AsyncBufReadExt;
-use crate::{BotError, BotResult};
-use crate::utils::file_util::{file_tmp_random_image_path, get_resources_path};
+use crate::{BotError, BotResult, resource_path, resource_tmp_path};
 use crate::utils::image::{file_to_image, MSYHBD};
 
 
 pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
     let mut text = text.replace(".n", "\n");
-    text.push_str("_br");
     let vec = text.split(".n").collect::<Vec<_>>();
     let mut num = 0;
     for str in vec {
@@ -39,7 +35,7 @@ pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
         })?;
 
     writer.set_img(
-        format!("{}/long1.png", get_resources_path(vec!["image", "emoji"])).as_str(),
+        resource_path!("image","emoji" => "long1.png").unwrap_or_default().as_str(),
         675,
         609,
         style::Style {
@@ -57,7 +53,7 @@ pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
             ..style::WindowStyle::default()
         })?;
     content.set_text(
-        text.replace(" _br", "").as_str(),
+        text.as_str(),
         style::Style {
             color: style::Rgba([0, 0, 0, 255]),
             line_height: 2.,
@@ -76,8 +72,13 @@ pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
             position: style::Position::Absolute,
             ..style::Style::default()
         })?;
-    let string = file_tmp_random_image_path("long1", "png", &["emoji"]);
-    writer.generate(string.as_str().as_ref())?;
-    let vec = file_to_image(string)?;
-    Ok(vec)
+
+    match resource_tmp_path!("emoji" => "long1.png") {
+        None => { Err(BotError::from("获取路径失败喵...")) }
+        Some(path) => {
+            writer.generate(path.as_str().as_ref())?;
+            let vec = file_to_image(path)?;
+            Ok(vec)
+        }
+    }
 }

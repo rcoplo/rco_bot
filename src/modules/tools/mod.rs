@@ -1,2 +1,2 @@
-mod group;
-pub mod mc_server_status_get;
+pub mod group;
+pub mod mc_server_status;

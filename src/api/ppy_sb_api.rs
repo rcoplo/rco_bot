@@ -1,5 +1,4 @@
-use crate::BotResult;
-use crate::utils::http_util::{http_get, http_post_json};
+use proc_qq::re_exports::{serde, serde_json};
 
 static PPY_SB_API_URL: &str = "https://osu.ppy.sb/apiv2";
 
@@ -17,9 +16,9 @@ impl OsuSbApi {
         }
     }
 
-    pub async fn get_user_info(&self) -> BotResult<OsuSbUserInfo> {
-        let url = format!("{}/users/{}",PPY_SB_API_URL, self.user_name);
-        let data = http_get(&url).await?;
+    pub async fn get_user_info(&self) -> crate::BotResult<OsuSbUserInfo> {
+        let url = format!("{}/users/{}", PPY_SB_API_URL, self.user_name);
+        let data = crate::utils::http_util::http_get(&url).await?;
         let result = serde_json::from_str::<OsuSbUserInfo>(data.as_str())?;
         Ok(result)
     }

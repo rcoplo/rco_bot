@@ -1,27 +1,30 @@
 use chrono::NaiveDateTime;
-use crate::{BotError, BotResult, pool};
+use rand::Rng;
+use crate::{BotError, BotResult, CONTEXT, pool};
 use crate::database::table::Sign;
 
-pub struct SignImpl{}
+pub struct SignImpl {}
 
 
 impl SignImpl {
-    pub async fn insert(&self,sign:&Sign) ->BotResult<bool>{
+    pub async fn insert(&self, sign: &Sign) -> BotResult<bool> {
         Sign::insert(pool!(), sign).await?;
         Ok(true)
     }
 
-    pub async fn update_sign_time(&self,sign_time:&NaiveDateTime,user_id:&i64) -> BotResult<bool>{
+    pub async fn update_sign_time(&self, sign_time: &NaiveDateTime, user_id: i64) -> BotResult<bool> {
         let sign = self.select_sign(user_id).await?;
-        let sign  = Sign{
-            sign_time:* sign_time,
-            ..sign.clone()
+        let i = rand::thread_rng().gen_range(0.0..CONTEXT.config.sign_config.scope);
+        let sign = Sign {
+            sign_time: *sign_time,
+            favorability: (sign.favorability + i),
+            ..sign
         };
         Sign::update_by_column(pool!(), &sign, "id").await?;
         Ok(true)
     }
 
-    pub async fn select_sign(&self,user_id:&i64)-> BotResult<Sign>{
+    pub async fn select_sign(&self, user_id: i64) -> BotResult<Sign> {
         let sign = Sign::select_sign(pool!(), user_id).await?;
         match sign {
             None => {

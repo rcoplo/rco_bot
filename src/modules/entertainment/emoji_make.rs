@@ -1,62 +1,33 @@
-use proc_qq::{event, GroupMessageEvent, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, Module, module};
-use rbatis::dark_std::err;
-use crate::BotResult;
-use crate::msg_util::MessageChain;
+use proc_qq::{event, MessageEvent, MessageSendToSourceTrait, module, Module};
+use crate::BotError;
+use crate::msg_util::{CanReply, MessageChain};
 use crate::utils::image::emoji_make_util::long1_emoji_make_image;
-use crate::utils::Reg;
 
-
-static ID: &'static str = "emoji_make";
-static NAME: &'static str = "表情制作";
-
-pub struct EmojiMakeHelp {
-    pub mod_name: String,
-    pub help_text: Vec<String>,
-}
-
-impl Default for EmojiMakeHelp {
-    fn default() -> Self {
-        EmojiMakeHelp {
-            mod_name: "表情制作".to_string(),
-            help_text: vec![
-                "emoji_make help",
-                "\" .n \" 是换行",
-                "code           name        图片本体",
-                "long1          ↑           无",
-            ].iter().map(|str| str.to_string()).collect::<Vec<_>>(),
-        }
-    }
-}
 
 pub(crate) fn module() -> Module {
-    module!(
-        ID,
-        NAME,
-        emoji_make_long,
+    module!("emoji",
+        "emoji",
+        emoji_make_long
     )
 }
 
-#[event]
-pub async fn emoji_make_long(event: &MessageEvent) -> anyhow::Result<bool> {
-    let content = event.message_content();
-    let (b, msg_array) = Reg::ex_msg(content.as_str(), &["emoji[\\s]+(.*)"], Some(&[Reg::All]));
-    if b {
-        let mut string = String::new();
-        if msg_array.len() > 3 {
-            for (i, str) in msg_array.iter().enumerate() {
-                if i >= 2 {
-                    string.push_str(str.as_str());
-                    string.push_str(" ");
-                }
-            }
-        } else {
-            string = msg_array[2].to_string()
-        }
-        if msg_array[1].eq("long1") {
-            let result = long1_emoji_make_image(string.as_str());
-            return match result {
+#[event(bot_command = "/emoji {image_type} {string}")]
+pub async fn emoji_make_long(
+    event: &MessageEvent,
+    image_type: Option<String>,
+    string: Option<String>,
+) -> anyhow::Result<bool> {
+    if let Some(image_type) = image_type {
+        if let Some(string) = string {
+            let req = match image_type.as_str() {
+                "long1" => Ok(long1_emoji_make_image(string.as_str())?),
+                _ => Err(BotError::from("没有这个emoji合成喵...")),
+            };
+            return match req {
                 Ok(data) => {
-                    event.send_message_to_source(MessageChain::new().image_vec(data, &event).await.ok()).await?;
+                    event
+                        .send_message_to_source(MessageChain::new().image_bytes(data, &event).await.build())
+                        .await?;
                     Ok(true)
                 }
                 Err(err) => {
@@ -64,7 +35,18 @@ pub async fn emoji_make_long(event: &MessageEvent) -> anyhow::Result<bool> {
                     Ok(true)
                 }
             }
+        } else {
+            event.at_text("后面必须要有字符串喵!")
+                .await?;
+            return Ok(true);
         }
+    } else {
+        event.reply(MessageChain::new()
+            .text("可用emoji:\n")
+            .text(">    long1\n")
+            .build())
+            .await?;
+        return Ok(true);
     }
     Ok(false)
 }
