@@ -1,46 +1,36 @@
-/*
- * @Author: RCOPLO
- * @Date: 2023-01-25 15:47:04
- * @LastEditors: RCOPLO
- * @LastEditTime: 2023-01-31 00:23:21
- * @FilePath: \RcoBot\src\main.rs
- */
-
 use proc_qq::re_exports::ricq::version::ANDROID_WATCH;
 use proc_qq::{
-    result, run_client, Authentication, ClientBuilder, CustomUinPassword, DeviceSource,
-    EventResult, ShowQR,
+    result, run_client, Authentication, ClientBuilder, DeviceSource, EventResult, FileSessionStore,
+    SessionStore,
 };
+use rco_bot::{modules, CONTEXT};
 use std::sync::Arc;
-use tracing::Level;
+use proc_qq::re_exports::{anyhow, tokio, tracing};
+use proc_qq::re_exports::tracing::Level;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use rco_bot::{CONTEXT, modules};
+
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_tracing_subscriber();
     CONTEXT.init_pool().await;
-    let config = CONTEXT.config.clone();
-    let authentication=  match config.login_type.as_str() {
-        "uin_pwd" =>{
-            Authentication::UinPassword(
-                config.account.uin,
-                config.account.pwd,
-            )
-        }
-        "qr_code" =>{
-            Authentication::QRCode
-        }
-        _ => Authentication::Abandon
+
+    let config = CONTEXT.config.bot_config.clone();
+    let authentication = match config.login_type.as_str() {
+        "uin_pwd" => Authentication::UinPassword(config.account_uin, config.account_pwd),
+        "qr_code" => Authentication::QRCode,
+        _ => Authentication::Abandon,
     };
     let client = ClientBuilder::new()
-        .device(DeviceSource::JsonFile("device.json".to_owned()))
+        .device(DeviceSource::JsonFile(
+            "./resources/data/device.json".to_owned(),
+        ))
         .version(&ANDROID_WATCH)
-        .priority_session("session.token")
+        .session_store(FileSessionStore::boxed("./resources/data/session.token"))
         .authentication(authentication)
         .show_slider_pop_menu_if_possible()
-        .modules(modules::all_modules())
+        .modules(Arc::new(modules::all_modules()))
         .result_handlers(vec![on_result {}.into()])
         .build()
         .await
@@ -49,7 +39,10 @@ async fn main() -> anyhow::Result<()> {
     let client = Arc::new(client);
     let copy = client.clone();
     tokio::spawn(async move {
-        tracing::info!("{:?}", chrono::NaiveDateTime::from_timestamp_millis(copy.rq_client.start_time.into()));
+        tracing::info!(
+            "{:?}",
+            chrono::NaiveDateTime::from_timestamp_millis(copy.rq_client.start_time.into())
+        );
     });
     run_client(client).await?;
     Ok(())
@@ -72,7 +65,8 @@ fn init_tracing_subscriber() {
                 .with_target("proc_qq", level)
                 .with_target("rco_bot", level)
                 .with_target("rbatis", level)
-                .with_target("tracing", level),
+                .with_target("tracing", level)
+                .with_target("hyper", level),
         )
         .init();
 }

@@ -1,11 +1,9 @@
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Deserializer};
-use serde_json::Value;
-
+use serde::Deserialize;
 
 pub fn deserde_from_int<'de, D>(deserializer: D) -> Result<bool, D::Error>
     where
-        D: Deserializer<'de>,
+        D: serde::Deserializer<'de>,
 {
     let i = u32::deserialize(deserializer)?;
     Ok(i == 0)
@@ -60,4 +58,7 @@ pub struct McServer {
     pub group_id: i64,
     pub name: String,
     pub url: String,
+    pub server_type: String,
 }
+
+

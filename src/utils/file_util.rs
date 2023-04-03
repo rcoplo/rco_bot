@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use proc_qq::re_exports::tracing;
 use rbatis::rbdc::uuid;
 
 pub fn get_resources_path(path: Vec<&str>) -> String {
@@ -18,10 +19,8 @@ pub fn file_tmp_random_image_path(name: &str, ext: &str, file: &[&str]) -> Strin
             get_resources_path(vec!["tmp",string1.as_str()])
         }
         _ => {
-            let mut vec = vec!["resources"];
-            for x in file {
-                vec.push(x);
-            }
+            let mut vec = vec!["resources", "tmp"];
+            vec.append(&mut file.to_vec());
             let mut string2 = join_paths(vec);
             let string = uuid::Uuid::new().0;
             let mut string1 = string.replace("-", "_");

@@ -1,29 +1,31 @@
-use proc_qq::{event, Module, module};
+use proc_qq::{event, JoinGroupRequestEvent, MessageChainParseTrait, Module, module};
+
+use crate::msg_util::MessageChain;
 
 
-static ID: &'static str = "Group";
-static NAME: &'static str = "Group";
-
-pub struct GroupHelp {
-    pub mod_name: String,
-    pub help_text: Vec<String>,
+pub(crate) fn module() -> Module {
+    module!(
+        "group",
+        "group",
+        group_tool_join_group,
+    )
 }
 
-impl Default for GroupHelp {
-    fn default() -> Self {
-        GroupHelp {
-            mod_name: "Group".to_string(),
-            help_text: vec![
-                "group_help",
-                "----------------------------------------------------------------",
-            ].iter().map(|str| str.to_string()).collect::<Vec<_>>(),
+#[event]
+async fn group_tool_join_group(event: &JoinGroupRequestEvent) -> anyhow::Result<bool> {
+    match event.accept().await {
+        Ok(_) => {
+            let chain = MessageChain::new()
+                .at(event.inner.req_uin)
+                .text(" 欢迎大佬入群喵~~")
+                .build();
+            event.client.send_group_message(event.inner.group_code, chain).await?;
+            Ok(true)
+        }
+        Err(err) => {
+            event.client.send_group_message(event.inner.group_code, err.to_string().parse_message_chain()).await?;
+            Ok(true)
         }
     }
 }
 
-pub(crate) fn module() -> Module {
-    module!(
-        ID,
-        NAME,
-    )
-}

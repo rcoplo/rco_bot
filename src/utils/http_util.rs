@@ -1,5 +1,6 @@
+use proc_qq::re_exports::{serde_json, tokio};
+use proc_qq::re_exports::anyhow::__private::kind::TraitKind;
 use reqwest::header::HeaderMap;
-use tracing::event;
 use crate::{BotError, BotResult};
 
 pub async fn http_get(url: &str) -> BotResult<String> {
@@ -14,15 +15,27 @@ pub async fn http_get(url: &str) -> BotResult<String> {
 }
 
 pub async fn http_get_image(url: &str) -> BotResult<Vec<u8>> {
-    let bytes = reqwest::get(url)
-        .await.unwrap().error_for_status();
-    match bytes {
-        Ok(bytes) => {
-            let bytes = bytes.bytes().await?;
-            Ok(bytes.to_vec())
+    let bytes = match reqwest::get(url).await {
+        Ok(res) => {
+            res
         }
         Err(err) => {
-            Err(BotError::from(err))
+            return Err(BotError::from(format!("获取图片失败,响应码: {:?}\n image url: {}", err.status(), url)));
+        }
+    };
+    match tokio::time::timeout(std::time::Duration::from_secs(60), bytes.bytes()).await {
+        Ok(bytes) => {
+            match bytes {
+                Ok(b) => {
+                    Ok(b.to_vec())
+                }
+                Err(err) => {
+                    return return Err(BotError::from(format!("获取图片失败,响应码: {:?}\n image url: {}", err.status(), url)));
+                }
+            }
+        },
+        Err(_) => {
+            Err(BotError::from("获取图片超时喵..."))
         }
     }
 }

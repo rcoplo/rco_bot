@@ -1,12 +1,10 @@
-use std::path::Path;
 use chrono::{Datelike, NaiveDateTime};
 use etternaonline_api::v2::UserDetails;
 use og_image_writer::img::ImageInputFormat;
 use og_image_writer::style;
 use og_image_writer::writer::OGImageWriter;
-use crate::BotResult;
-use crate::utils::file_util::file_tmp_random_image_path;
-use crate::utils::http_util::http_get_image;
+use proc_qq::re_exports::{anyhow, serde_json};
+use crate::{resource_tmp_path};
 use crate::utils::image::{file_to_image, MSYHBD};
 
 
@@ -35,17 +33,17 @@ impl EttUserInfoImage {
         }
     }
 
-    pub fn ok(&mut self,avatars:&Vec<u8>) -> anyhow::Result<Vec<u8>>{
+    pub fn build(&mut self, avatars: &Vec<u8>) -> anyhow::Result<Vec<u8>> {
         //设置 username country_code
-        if self.user_data.player_rating == 0.0{
+        if self.user_data.player_rating == 0.0 {
             return Err(anyhow::Error::msg("rating为0喵... 获取数据没有意义喵..."))
         }
         self.image_writer.set_text(
-            format!("{}  -  {}",self.user_data.username,self.user_data.country_code).as_str(),
-            style::Style{
-                margin: style::Margin(40,0,0,80),
-                position:style::Position::Absolute,
-                color:style::Rgba([255,255,255,255]),
+            format!("{}  -  {}", self.user_data.username, self.user_data.country_code).as_str(),
+            style::Style {
+                margin: style::Margin(40, 0, 0, 80),
+                position: style::Position::Absolute,
+                color: style::Rgba([255, 255, 255, 255]),
                 font_size:100.,
                 ..style::Style::default()
             },
@@ -152,10 +150,15 @@ impl EttUserInfoImage {
             Some(Vec::from(MSYHBD)),
         )?;
         // 生成图片
-        let string = file_tmp_random_image_path("EttUserInfoImage", "png", &[]);
-        self.image_writer.generate(Path::new(&string))?;
-        let vec = file_to_image(string)?;
-        Ok(vec)
+
+        match resource_tmp_path!( "EttUserInfoImage.png") {
+            None => { Err(anyhow::Error::msg("获取路径失败喵...")) }
+            Some(path) => {
+                self.image_writer.generate(path.as_str().as_ref())?;
+                let vec = file_to_image(path)?;
+                Ok(vec)
+            }
+        }
     }
     /// 设置 rating
     fn set_rating(&mut self, v: serde_json::Value) -> anyhow::Result<()> {

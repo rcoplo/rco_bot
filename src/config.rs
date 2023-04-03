@@ -1,31 +1,39 @@
-#[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RcoBotConfig {
     pub debug: bool,
-    pub chrome_driver_url: String,
-    pub login_type:String,
-    pub account:Account,
-    pub ett:EttConfig,
-    pub setu:SetuConfig,
-    pub super_admin:Vec<String>,
-    pub bot_name:Vec<String>,
+    pub bot_config: BotConfig,
+    pub ett: EttConfig,
+    pub setu: SetuConfig,
+    pub apex_api: String,
+    pub sign_config: SignConfig,
 }
-#[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
-pub struct Account {
-    pub uin:i64,
-    pub pwd:String,
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct BotConfig {
+    pub login_type: String,
+    pub super_admin: Vec<String>,
+    pub bot_name: Vec<String>,
+    pub account_uin: i64,
+    pub account_pwd: String,
 }
-#[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EttConfig {
-    pub uin:String,
-    pub pwd:String,
+    pub uin: String,
+    pub pwd: String,
     pub cooldown: Option<i32>,
     pub timeout: Option<i32>,
 }
 
-#[derive(Debug,Clone,serde::Serialize,serde::Deserialize)]
-pub struct SetuConfig{
-    pub recall_time:i32,
-    pub whether_to_save_locally:bool,
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SetuConfig {
+    pub recall_time: i32,
+    pub whether_to_save_locally: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SignConfig {
+    pub scope: f64,
 }
 
 

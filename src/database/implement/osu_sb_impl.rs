@@ -1,5 +1,5 @@
 use std::fmt::Formatter;
-use rbatis::rbdc::Error;
+
 use crate::{BotError, BotResult, pool};
 use crate::api::ppy_sb_api::OsuSbApi;
 use crate::database::table::OsuSb;

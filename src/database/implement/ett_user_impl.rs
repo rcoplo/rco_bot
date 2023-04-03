@@ -1,17 +1,13 @@
 use chrono::NaiveDateTime;
-use etternaonline_api::v2::{Session, UserDetails};
-use rbatis::dark_std::err;
-use rbatis::rbdc::db::ExecResult;
-use rbatis::rbdc::Error;
 use crate::{BotError, BotResult, pool};
 use crate::database::table::EttUser;
-use crate::utils::image::ett::ETT_CLIENT;
+
 
 pub struct EttUserImpl {}
 
 
 impl EttUserImpl {
-    pub async fn ett_build_by_name_qq(&self, user_name: &String, user_id_qq: i64) -> BotResult<()> {
+    pub async fn ett_build_by_name_qq(&self, user_name: &str, user_id_qq: i64) -> BotResult<()> {
         match self.ett_select_by_name_qq(user_id_qq).await {
             Ok(data) => {
                 Err(BotError::from(format!("你已经绑定了一位叫 {} 的用户,解绑请使用 /ett untie 喵!", data.user_name)))
@@ -21,7 +17,7 @@ impl EttUserImpl {
                 match option {
                     None => {
                         EttUser::insert(pool!(), &EttUser {
-                            user_name: user_name.clone(),
+                            user_name: user_name.to_string(),
                             user_id_qq,
                             update_time: chrono::Local::now().naive_local(),
                             ..Default::default()

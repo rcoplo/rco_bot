@@ -1,10 +1,6 @@
 use etternaonline_api::v2::Session;
-use og_image_writer::font_context::FontContext;
 use once_cell::sync::Lazy;
 use crate::{BotResult, CONTEXT};
-use crate::utils::image::ett::ett_user_info_image::EttUserInfoImage;
-use crate::utils::image::MSYHBD;
-
 pub mod ett_user_info_image;
 
 
