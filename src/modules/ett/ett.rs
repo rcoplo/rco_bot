@@ -145,10 +145,11 @@ async fn ett_module(event: &MessageEvent, et_type: Option<String>, name: Option<
     } else {
         event.reply(
             MessageChain::new()
-                .text("可用子指令:")
-                .text(">    info")
-                .text(">    build")
+                .text("可用 {command}:")
+                .text(">    info {user_name}?")
+                .text(">    build {user_name}")
                 .text(">    untie")
+                .text("使用方法:/ett {command} {user_name}?")
                 .build()
         ).await?;
         return Ok(true);

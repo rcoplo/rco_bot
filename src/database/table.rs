@@ -1,30 +1,31 @@
 use chrono::NaiveDateTime;
-use serde::Deserialize;
+use proc_qq::re_exports::tracing;
+use serde::{Deserialize, Deserializer};
 
 pub fn deserde_from_int<'de, D>(deserializer: D) -> Result<bool, D::Error>
     where
-        D: serde::Deserializer<'de>,
+        D: Deserializer<'de>,
 {
     let i = u32::deserialize(deserializer)?;
-    Ok(i == 0)
+    Ok(i != 0)
 }
 
-#[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
-pub struct BiliPush{
+#[derive(Debug, Clone, Default, serde::Deserialize, serde::Serialize)]
+pub struct BiliPush {
     pub id: Option<i32>,
     pub room_id: i64,
     pub uid: i64,
     pub uname: String,
-    pub group_id: String,
+    pub group_id: i64,
     pub live_status: i32,
     pub latest_video_time: i64,
     pub latest_dynamic_time: i64,
     #[serde(deserialize_with = "deserde_from_int")]
     pub live_push: bool,
     #[serde(deserialize_with = "deserde_from_int")]
-    pub video_push:bool,
+    pub video_push: bool,
     #[serde(deserialize_with = "deserde_from_int")]
-    pub dynamic_push:bool,
+    pub dynamic_push: bool,
 }
 #[derive(Debug , Clone,Default,serde::Deserialize,serde::Serialize)]
 pub struct Sign {

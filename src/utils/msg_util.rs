@@ -10,6 +10,8 @@ use proc_qq::re_exports::ricq_core::RQError;
 use proc_qq::re_exports::ricq_core::structs::{ForwardMessage, MessageNode, MessageReceipt};
 use proc_qq::re_exports::{tokio, tracing};
 use proc_qq::re_exports::async_trait::async_trait;
+use proc_qq::re_exports::ricq::msg::elem::GroupImage;
+use proc_qq::re_exports::tracing::event;
 use rbatis::dark_std::err;
 
 
@@ -28,6 +30,12 @@ impl MessageChain {
         Self {
             inner: MessageChainBuilder::new().build(),
         }
+    }
+    pub fn is_empty(&self) -> bool {
+        self.inner.0.is_empty()
+    }
+    pub fn clear(&mut self) {
+        self.inner.0.clear()
     }
 
     pub fn text<T: AsRef<str>>(&mut self, text: T) -> &mut MessageChain {
@@ -77,8 +85,8 @@ impl MessageChain {
         }
         self
     }
-    pub async fn image_bytes(&mut self, data: Vec<u8>, event: &MessageEvent) -> &mut MessageChain {
-        let upload_res = event.upload_image_to_source(data).await;
+    pub async fn image_bytes(&mut self, image: Vec<u8>, event: &MessageEvent) -> &mut MessageChain {
+        let upload_res = event.upload_image_to_source(image).await;
         match upload_res {
             Ok(image) => {
                 self.inner.push(image);
@@ -89,9 +97,22 @@ impl MessageChain {
         }
         self
     }
+    pub async fn image_bytes_task(&mut self, image: RQResult<GroupImage>) -> &mut MessageChain {
+        match image {
+            Ok(image) => {
+                self.inner.push(UploadImage::GroupImage(image));
+            }
+            Err(err) => {
+                self.inner.push(Text::new(format!("上传图片失败喵... \nRQError: {}", err)));
+            }
+        }
+        self
+    }
 
-    pub fn at(&mut self, user_id: i64) -> &mut MessageChain {
-        self.inner.push(At::new(user_id));
+    pub fn at(&mut self, user_id: i64, user_name: &str) -> &mut MessageChain {
+        let mut at = At::new(user_id);
+        at.display = format!("@{}", user_name);
+        self.inner.push(at);
         self
     }
 

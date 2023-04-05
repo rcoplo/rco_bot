@@ -42,11 +42,11 @@ pub async fn emoji_make_long(
         }
     } else {
         event.reply(MessageChain::new()
-            .text("可用emoji:\n")
+            .text("可用 {emoji}: \n")
             .text(">    long1\n")
+            .text("指令: /emoji {emoji} {string}")
             .build())
             .await?;
         return Ok(true);
     }
-    Ok(false)
 }
