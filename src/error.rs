@@ -57,6 +57,7 @@ bot_error!(etternaonline_api::Error);
 bot_error!(og_image_writer::Error);
 bot_error!(proc_qq::re_exports::ricq::RQError);
 
+
 impl Clone for BotError {
     fn clone(&self) -> Self {
         BotError::from(self.to_string())

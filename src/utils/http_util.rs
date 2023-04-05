@@ -4,7 +4,11 @@ use reqwest::header::HeaderMap;
 use crate::{BotError, BotResult};
 
 pub async fn http_get(url: &str) -> BotResult<String> {
-    let data = reqwest::get(url)
+    let data = reqwest::ClientBuilder::new()
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36")
+        .build()?
+        .get(url)
+        .send()
         .await?
         .text()
         .await;

@@ -2,6 +2,8 @@
 #![allow(unused_variables)] //允许未使用的变量
 #![allow(unused_must_use)]
 #![feature(const_trait_impl)]
+#![feature(async_closure)]
+
 pub mod modules;
 pub mod database;
 mod config;
@@ -9,14 +11,19 @@ mod utils;
 mod api;
 mod error;
 pub mod basic_modules;
+pub mod scheduler;
+
 
 use once_cell::sync::Lazy;
+
 use proc_qq::re_exports::tracing;
+
 use rbatis::{Error, log, Rbatis};
 use rbatis::executor::RbatisRef;
 use rbatis::table_sync::{SqliteTableSync, TableSync};
 use rbdc_sqlite::driver::SqliteDriver;
 use rbs::to_value;
+use tracing_subscriber::util::SubscriberInitExt;
 pub use config::*;
 pub use config::*;
 pub use utils::{
@@ -37,13 +44,14 @@ extern crate rbatis;
 
 pub static CONTEXT: Lazy<BotConText> = Lazy::new(||{BotConText::default()});
 
-
 #[macro_export]
 macro_rules! pool {
     () => {
-        &mut $crate::CONTEXT.rbatis.clone()
+        Box::leak(Box::new($crate::CONTEXT.rbatis.clone()))
     };
+
 }
+
 
 pub struct BotConText {
     pub config: RcoBotConfig,

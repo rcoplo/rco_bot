@@ -9,7 +9,8 @@ edition = "2021"
 #大多库使用proc_qq重导出的库
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0"
-tracing-subscriber = "0"
+tracing-subscriber = { version = "0", features = ["time", "env-filter", "fmt"] }
+time = { version = "0.3", features = ["macros"] }
 proc_qq = { git = "https://github.com/rcoplo/rust_proc_qq" }
 
 rbs = { version = "4.3" }
@@ -31,3 +32,5 @@ etternaonline_api = { version = "0.2.0", features = ["serde"] }
 
 #osu api
 rosu-v2 = "0.6.2"
+
+tokio-cron-scheduler = "0.9.4"

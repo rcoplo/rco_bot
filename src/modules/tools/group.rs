@@ -16,7 +16,7 @@ async fn group_tool_join_group(event: &JoinGroupRequestEvent) -> anyhow::Result<
     match event.accept().await {
         Ok(_) => {
             let chain = MessageChain::new()
-                .at(event.inner.req_uin)
+                .at(event.inner.req_uin, event.inner.req_nick.as_str())
                 .text(" 欢迎大佬入群喵~~")
                 .build();
             event.client.send_group_message(event.inner.group_code, chain).await?;

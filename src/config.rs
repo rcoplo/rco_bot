@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RcoBotConfig {
-    pub debug: bool,
+    pub log: String,
     pub bot_config: BotConfig,
     pub ett: EttConfig,
     pub setu: SetuConfig,

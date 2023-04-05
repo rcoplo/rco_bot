@@ -38,14 +38,50 @@ async fn setur(event: &MessageEvent, data: Vec<String>) -> anyhow::Result<bool> 
     Ok(false)
 }
 
-async fn delete_msg(client: Arc<Client>, data: MessageReceipt, group_id: i64) -> anyhow::Result<()> {
+async fn delete_msg(event: &MessageEvent, receipt: MessageReceipt) -> anyhow::Result<()> {
+    match event {
+        MessageEvent::GroupMessage(e) => {
+            delete_msg_group(event.client(),
+                             receipt,
+                             e.inner.group_code).await?;
+        }
+        MessageEvent::FriendMessage(e) => {
+            delete_msg_friend(event.client(),
+                              receipt,
+                              e.inner.from_uin).await?;
+        }
+        MessageEvent::GroupTempMessage(e) => {
+            delete_msg_friend(event.client(),
+                              receipt,
+                              e.inner.from_uin).await?;
+        }
+    }
+    Ok(())
+}
+
+async fn delete_msg_group(client: Arc<Client>, receipt: MessageReceipt, group_id: i64) -> anyhow::Result<()> {
     let client = client.clone();
     tokio::spawn(async move {
         tokio::time::sleep(Duration::from_secs(CONTEXT.config.setu.recall_time as u64)).await;
         client.recall_group_message(
             group_id,
-            data.seqs,
-            data.rands,
+            receipt.seqs,
+            receipt.rands,
+        ).await;
+        tracing::info!("色图撤回成功喵!");
+    });
+    Ok(())
+}
+
+async fn delete_msg_friend(client: Arc<Client>, receipt: MessageReceipt, friend_id: i64) -> anyhow::Result<()> {
+    let client = client.clone();
+    tokio::spawn(async move {
+        tokio::time::sleep(Duration::from_secs(CONTEXT.config.setu.recall_time as u64)).await;
+        client.recall_friend_message(
+            friend_id,
+            receipt.time,
+            receipt.seqs,
+            receipt.rands,
         ).await;
         tracing::info!("色图撤回成功喵!");
     });
@@ -53,6 +89,10 @@ async fn delete_msg(client: Arc<Client>, data: MessageReceipt, group_id: i64) ->
 }
 
 async fn setu_send(event: &MessageEvent, setu: SetuType) -> anyhow::Result<bool> {
+    if event.is_temp_message() {
+        event.send("临时私聊无法使用该功能喵!").await?;
+        return Ok(true);
+    }
     return match setu {
         SetuType::Array(a) => {
             match LoliconApiBuilder::get_array(&a).await {
@@ -71,22 +111,16 @@ async fn setu_send(event: &MessageEvent, setu: SetuType) -> anyhow::Result<bool>
                                     let receipt = event.send_message_to_source(
                                         "这张发送失败喵...".parse_message_chain())
                                         .await?;
-                                    delete_msg(event.client(),
-                                               receipt,
-                                               event.as_group_message().unwrap().inner.group_code).await?;
+                                    delete_msg(&event, receipt).await?;
                                 } else {
-                                    delete_msg(event.client(),
-                                               s,
-                                               event.as_group_message().unwrap().inner.group_code).await?;
+                                    delete_msg(&event, s).await?;
                                 }
                             }
                             Err(_) => {
                                 let receipt = event.send_message_to_source(
                                     "这张发送失败喵...".parse_message_chain())
                                     .await?;
-                                delete_msg(event.client(),
-                                           receipt,
-                                           event.as_group_message().unwrap().inner.group_code).await?;
+                                delete_msg(&event, receipt).await?;
                             }
                         }
                     }
@@ -114,22 +148,16 @@ async fn setu_send(event: &MessageEvent, setu: SetuType) -> anyhow::Result<bool>
                                 let receipt = event.send_message_to_source(
                                     "色图发送失败喵...".parse_message_chain())
                                     .await?;
-                                delete_msg(event.client(),
-                                           receipt,
-                                           event.as_group_message().unwrap().inner.group_code).await?;
+                                delete_msg(&event, receipt).await?;
                             } else {
-                                delete_msg(event.client(),
-                                           s,
-                                           event.as_group_message().unwrap().inner.group_code).await?;
+                                delete_msg(&event, s).await?;
                             }
                         }
                         Err(_) => {
                             let receipt = event.send_message_to_source(
                                 "色图发送失败喵...".parse_message_chain())
                                 .await?;
-                            delete_msg(event.client(),
-                                       receipt,
-                                       event.as_group_message().unwrap().inner.group_code).await?;
+                            delete_msg(&event, receipt).await?;
                         }
                     }
                     Ok(true)
