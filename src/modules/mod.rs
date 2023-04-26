@@ -19,15 +19,8 @@ pub fn all_modules() -> Vec<Module> {
         // basic_modules::help::module(),
         tools::group::module(),
         tools::mc_server_status::module(),
+        tools::test_1::module(),
     ]
 }
 
-
-
-#[macro_export]
-macro_rules! command_to_vec {
-    ($command:expr) => {
-        $command.split_whitespace().collect::<Vec<String>>()
-    };
-}
 

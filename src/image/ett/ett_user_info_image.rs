@@ -4,8 +4,8 @@ use og_image_writer::img::ImageInputFormat;
 use og_image_writer::style;
 use og_image_writer::writer::OGImageWriter;
 use proc_qq::re_exports::{anyhow, serde_json};
-use crate::{resource_tmp_path};
-use crate::utils::image::{file_to_image, MSYHBD};
+use crate::image::{file_to_image, MSYHBD};
+use crate::resource_path;
 
 
 pub struct EttUserInfoImage {
@@ -150,15 +150,10 @@ impl EttUserInfoImage {
             Some(Vec::from(MSYHBD)),
         )?;
         // 生成图片
-
-        match resource_tmp_path!( "EttUserInfoImage.png") {
-            None => { Err(anyhow::Error::msg("获取路径失败喵...")) }
-            Some(path) => {
-                self.image_writer.generate(path.as_str().as_ref())?;
-                let vec = file_to_image(path)?;
-                Ok(vec)
-            }
-        }
+        let path = resource_path!("tmp","EttUserInfoImage.png");
+        self.image_writer.generate(path.as_str().as_ref())?;
+        let vec = file_to_image(path)?;
+        Ok(vec)
     }
     /// 设置 rating
     fn set_rating(&mut self, v: serde_json::Value) -> anyhow::Result<()> {

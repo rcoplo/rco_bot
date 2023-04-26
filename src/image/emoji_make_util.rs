@@ -1,8 +1,12 @@
-
+use dessin::{vec2, Vec2};
+use dessin::contrib::{TextBox, TextLayout};
+use dessin::shape::{Color, Fill, Image, ImageFormat};
+use dessin::style::TextAlign;
+use dessin_svg::ToSVG;
 use og_image_writer::{style};
 use og_image_writer::writer::OGImageWriter;
 use crate::{BotError, BotResult, resource_path, resource_tmp_path};
-use crate::utils::image::{file_to_image, MSYHBD};
+use crate::image::{file_to_image, MSYHBD, svg_to_png};
 
 
 pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
@@ -35,7 +39,7 @@ pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
         })?;
 
     writer.set_img(
-        resource_path!("image","emoji" => "long1.png").unwrap_or_default().as_str(),
+        resource_path!("image","emoji", "long1.png").as_str(),
         675,
         609,
         style::Style {
@@ -72,13 +76,36 @@ pub fn long1_emoji_make_image(text: &str) -> BotResult<Vec<u8>> {
             position: style::Position::Absolute,
             ..style::Style::default()
         })?;
+    let path = resource_tmp_path!("tmp","emoji" => "long1.png");
+    writer.generate(path.as_str().as_ref())?;
+    let vec = file_to_image(path)?;
+    Ok(vec)
+}
 
-    match resource_tmp_path!("emoji" => "long1.png") {
-        None => { Err(BotError::from("获取路径失败喵...")) }
-        Some(path) => {
-            writer.generate(path.as_str().as_ref())?;
-            let vec = file_to_image(path)?;
-            Ok(vec)
-        }
-    }
+pub fn good_news(text: &str) -> BotResult<Vec<u8>> {
+    let bad_w_h = vec2(600., 450.);
+    let mut drawing = dessin::Drawing::empty().with_canvas_size(bad_w_h);
+    let path = resource_path!("image","emoji","good_news.png");
+    drawing.add(
+        Image::new(ImageFormat::PNG(std::fs::read(path)?))
+            .at(Vec2::zero())
+            .with_size(bad_w_h)
+            .with_fill(Fill::Color(Color::GRAY))
+    );
+    drawing
+        .add(
+            TextLayout::new(text.to_owned())
+                .add_box(
+                    TextBox::new()
+                        .with_size(bad_w_h)
+                        .with_font_size(45. - (text.len() / 10) as f32)
+                        .with_fill(Fill::Color(Color::RED))
+                        .with_align(TextAlign::Center)
+                )
+        );
+    let svg = drawing.to_svg()?;
+    let path = resource_tmp_path!("tmp","emoji" => "good_news.png");
+    svg_to_png(svg, path.as_str())?;
+    let vec = file_to_image(path)?;
+    Ok(vec)
 }

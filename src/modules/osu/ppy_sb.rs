@@ -1,4 +1,5 @@
 use proc_qq::{event, MessageContentTrait, MessageEvent, Module, module};
+use proc_qq::re_exports::anyhow;
 
 
 static ID: &'static str = "osu_sb";

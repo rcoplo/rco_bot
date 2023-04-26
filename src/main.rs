@@ -1,4 +1,4 @@
-use proc_qq::re_exports::ricq::version::ANDROID_WATCH;
+use proc_qq::re_exports::ricq::version::ANDROID_PAD;
 use proc_qq::{
     result, run_client, Authentication, ClientBuilder, DeviceSource, EventResult, FileSessionStore,
     SessionStore,
@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
         .device(DeviceSource::JsonFile(
             "./resources/data/device.json".to_owned(),
         ))
-        .version(&ANDROID_WATCH)
+        .version(&ANDROID_PAD)
         .session_store(FileSessionStore::boxed("./resources/data/session.token"))
         .authentication(authentication)
         .show_slider_pop_menu_if_possible()
@@ -47,7 +47,8 @@ async fn main() -> anyhow::Result<()> {
     //添加定时任务
 
     let scheduler = Scheduler::new(copy).await;
-    scheduler.add(BiliPushTask).await;
+
+    // scheduler.add(BiliPushTask).await;
 
     scheduler.start().await;
     run_client(client).await

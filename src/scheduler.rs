@@ -28,13 +28,13 @@ impl Scheduler {
     /// 向定时任务执行器中添加一个定时任务
     pub async fn add(&self, job: impl ScheduledJob + Send + 'static + Sync) {
         let client = self.client.clone();
-        let job = Job::new_async(job.cron(), move |_, _| job.call(client.clone())).unwrap();
-        self.inner.add(job).await.unwrap();
+        let job = Job::new_async(job.cron(), move |_, _| job.call(client.clone())).expect("新建任务失败");
+        self.inner.add(job).await.expect("添加任务失败");
     }
 
     /// 启动定时任务执行器
     pub async fn start(&self) {
-        self.inner.start().await.unwrap();
+        self.inner.start().await.expect("启动任务失败");
     }
 }
 

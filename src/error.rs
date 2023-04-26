@@ -49,13 +49,16 @@ bot_error!(std::io::Error);
 bot_error!(reqwest::Error);
 bot_error!(serde_json::Error);
 bot_error!(serde_yaml::Error);
-bot_error!(regex::Error);
+bot_error!(proc_qq::re_exports::regex::Error);
 bot_error!(rbs::Error);
 bot_error!(rbatis::Error);
 bot_error!(rbdc_sqlite::error::SqliteError);
 bot_error!(etternaonline_api::Error);
 bot_error!(og_image_writer::Error);
 bot_error!(proc_qq::re_exports::ricq::RQError);
+bot_error!(Box<dyn StdError>);
+
+
 
 
 impl Clone for BotError {

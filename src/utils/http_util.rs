@@ -1,5 +1,4 @@
 use proc_qq::re_exports::{serde_json, tokio};
-use proc_qq::re_exports::anyhow::__private::kind::TraitKind;
 use reqwest::header::HeaderMap;
 use crate::{BotError, BotResult};
 

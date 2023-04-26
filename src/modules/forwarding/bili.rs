@@ -67,7 +67,7 @@ impl ScheduledJob for BiliPushTask {
                             chain.text(&format!("https://live.bilibili.com/{}\n", up.room_id));
                             match http_get_image(up.user_cover.as_str()).await {
                                 Ok(by) => {
-                                    let image = client.rq_client.upload_group_image(b.group_id, by).await;
+                                    let image = client.rq_client.upload_group_image(b.group_id, &by).await;
                                     chain.image_bytes_task(image).await;
                                 }
                                 Err(err) => {

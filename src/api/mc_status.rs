@@ -10,7 +10,14 @@ pub async fn get_minecraft_status_java(url: &str) -> BotResult<McStatusJava> {
     let data = http_get(format!("{}{}", STATUS_API_JAVA, url).as_str()).await?;
     match serde_json::from_str::<McStatusJava>(data.as_str()) {
         Ok(data) => Ok(data),
-        Err(err) => Err(BotError::from(format!("获取服务器信息失败喵... Error: {}", err))),
+        Err(_) => {
+            let data = http_get(&format!("https://api.mcsrvstat.us/simple/{}", url)).await?;
+            match data.as_str() {
+                "" => {}
+                _ => {}
+            }
+            Err(BotError::from(format!("获取服务器信息失败喵...,")))
+        },
     }
 }
 
@@ -18,7 +25,7 @@ pub async fn get_minecraft_status_bedrock(url: &str) -> BotResult<McStatusBedroc
     let data = http_get(format!("{}{}", STATUS_API_BEDROCK, url).as_str()).await?;
     match serde_json::from_str::<McStatusBedrock>(data.as_str()) {
         Ok(data) => Ok(data),
-        Err(err) => Err(BotError::from(format!("获取服务器信息失败喵... Error: {}", err))),
+        Err(_) => Err(BotError::from(format!("获取服务器信息失败喵... "))),
     }
 }
 
@@ -30,11 +37,11 @@ pub struct McStatusJava {
     pub eula_blocked: bool,
     pub retrieved_at: i64,
     pub expires_at: i64,
-    pub version: McStatusVersionJava,
-    pub players: McStatusPlayersJava,
-    pub motd: McStatusMotdJava,
-    pub icon: Option<String>,
-    pub mods: Vec<McStatusModsJava>,
+    pub version: Option<McStatusVersionJava>,
+    pub players: Option<McStatusPlayersJava>,
+    pub motd: Option<McStatusMotdJava>,
+    pub icon: Option<Option<String>>,
+    pub mods: Option<Vec<McStatusModsJava>>,
 
 }
 
@@ -84,12 +91,12 @@ pub struct McStatusBedrock {
     pub eula_blocked: bool,
     pub retrieved_at: i64,
     pub expires_at: i64,
-    pub version: McStatusVersionBedrock,
-    pub players: McStatusPlayersBedrock,
-    pub motd: McStatusMotdBedrock,
-    pub gamemode: String,
-    pub server_id: String,
-    pub edition: String,
+    pub version: Option<McStatusVersionBedrock>,
+    pub players: Option<McStatusPlayersBedrock>,
+    pub motd: Option<McStatusMotdBedrock>,
+    pub gamemode: Option<String>,
+    pub server_id: Option<String>,
+    pub edition: Option<String>,
 
 }
 
@@ -111,4 +118,3 @@ pub struct McStatusMotdBedrock {
     pub clean: String,
     pub html: String,
 }
-

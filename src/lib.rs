@@ -12,10 +12,10 @@ mod api;
 mod error;
 pub mod basic_modules;
 pub mod scheduler;
+pub mod image;
 
 
 use once_cell::sync::Lazy;
-
 use proc_qq::re_exports::tracing;
 
 use rbatis::{Error, log, Rbatis};
@@ -42,6 +42,7 @@ use crate::database::table::{BiliPush, EttUser, McServer, OsuSb, Sign};
 
 extern crate rbatis;
 
+
 pub static CONTEXT: Lazy<BotConText> = Lazy::new(||{BotConText::default()});
 
 #[macro_export]
@@ -51,7 +52,6 @@ macro_rules! pool {
     };
 
 }
-
 
 pub struct BotConText {
     pub config: RcoBotConfig,
@@ -80,7 +80,7 @@ impl Default for BotConText{
 
 impl BotConText {
     pub async fn init_pool(&self) {
-        let path = resource_path!("data" =>"bot.db").unwrap_or_default();
+        let path = resource_path!("data","bot.db");
         tracing::debug!("{}", &path);
         self.rbatis.init(SqliteDriver {}, path.as_str()).unwrap();
         let mut s = SqliteTableSync::default();

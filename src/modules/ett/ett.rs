@@ -1,12 +1,12 @@
 use proc_qq::{event, event_fn, MessageChainParseTrait, MessageEvent, MessageSendToSourceTrait, Module, module, ModuleEventHandler, ModuleEventProcess};
-use proc_qq::re_exports::tracing;
+use proc_qq::re_exports::{anyhow, tracing};
 
 use crate::{BotResult, CONTEXT};
+use crate::image::ett::ETT_CLIENT;
+use crate::image::ett::ett_user_info_image::EttUserInfoImage;
 
 use crate::msg_util::{CanReply, MessageChain};
 use crate::utils::http_util::http_get_image;
-use crate::utils::image::ett::{ETT_CLIENT};
-use crate::utils::image::ett::ett_user_info_image::EttUserInfoImage;
 
 use crate::utils::ToJson;
 

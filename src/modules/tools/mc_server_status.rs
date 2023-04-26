@@ -1,7 +1,7 @@
 use chrono::{Timelike};
 use proc_qq::{event, GroupMessageEvent, MessageChainParseTrait, MessageContentTrait, MessageEvent, MessageSendToSourceTrait, Module, module};
+use proc_qq::re_exports::anyhow;
 use proc_qq::re_exports::ricq::structs::GroupMemberPermission;
-use regex::RegexSet;
 use crate::api::mc_status::{get_minecraft_status_bedrock, get_minecraft_status_java};
 use crate::{CONTEXT};
 use crate::database::implement::mc_server_impl::McServerType;
@@ -19,8 +19,8 @@ pub(crate) fn module() -> Module {
 
 #[event(bot_command = "/list {name}")]
 async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) -> anyhow::Result<bool> {
-    if let Some(name) = name {
-        return match CONTEXT.mc_server.select_server_by_name_group_id(name.to_uppercase().as_str(), event.inner.group_code).await {
+    return if let Some(name) = name {
+        match CONTEXT.mc_server.select_server_by_name_group_id(name.to_uppercase().as_str(), event.inner.group_code).await {
             None => {
                 event.at_text("本群并没有这个服务器简称喵...").await?;
                 Ok(true)
@@ -34,8 +34,9 @@ async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) 
                                     Ok(status) => {
                                         if status.online {
                                             let mut chain = MessageChain::new();
-                                            chain.text(format!("{} Online: {}/{}\n", mc_server.name, status.players.online, status.players.max));
-                                            let vec = status.players.list
+                                            let player = status.players.unwrap();
+                                            chain.text(format!("{} Online: {}/{}\n", mc_server.name, player.online, player.max));
+                                            let vec = player.list
                                                 .iter()
                                                 .map(|list| {
                                                     list.name_raw.to_owned()
@@ -74,7 +75,8 @@ async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) 
                                     Ok(status) => {
                                         if status.online {
                                             let mut chain = MessageChain::new();
-                                            chain.text(format!("{} Players: {}/{}\n", mc_server.name, status.players.online, status.players.max));
+                                            let player = status.players.unwrap();
+                                            chain.text(format!("{} Players: {}/{}\n", mc_server.name, player.online, player.max));
                                             chain.text("Bedrock版无法获取到玩家列表喵!");
                                             let cache_time = chrono::NaiveDateTime::from_timestamp_millis(status.expires_at).unwrap_or_default();
                                             let time = chrono::Utc::now().naive_utc();
@@ -105,12 +107,12 @@ async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) 
                     }
                 }
             }
-        };
+        }
     } else {
         match CONTEXT.mc_server.select_server_all_by_group_id(event.inner.group_code).await {
             None => {
                 event.send("本群没有绑定服务器喵...").await?;
-                return Ok(true);
+                Ok(true)
             }
             Some(v) => {
                 if v.is_empty() {
@@ -124,7 +126,7 @@ async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) 
                 }
                 chain.text("可用指令:  /list {name}");
                 event.send_message_to_source(chain.build()).await?;
-                return Ok(true);
+                Ok(true)
             }
         }
     }
@@ -132,9 +134,9 @@ async fn mc_server_status_list(event: &GroupMessageEvent, name: Option<String>) 
 
 #[event(bot_command = "/mc {mc_type} {name} {new_data}")]
 async fn mc_server_status(event: &GroupMessageEvent, mc_type: Option<String>, name: Option<String>, new_data: Option<String>) -> anyhow::Result<bool> {
-    if let Some(mc_type) = mc_type {
+    return if let Some(mc_type) = mc_type {
         if event.is_admin().await {
-            return match mc_type.as_str() {
+            match mc_type.as_str() {
                 "add" => {
                     if let (Some(name), Some(new_data)) = (name, new_data) {
                         match CONTEXT.mc_server.new(name.to_uppercase().as_str(), new_data.as_str(), event.inner.group_code, Ok(McServerType::JAVA)).await {
@@ -224,10 +226,10 @@ async fn mc_server_status(event: &GroupMessageEvent, mc_type: Option<String>, na
                     event.send_message_to_source("没有这个子指令喵...".parse_message_chain()).await?;
                     Ok(true)
                 }
-            };
+            }
         } else {
             event.reply_text("你没有权限使用该指令喵...").await?;
-            return Ok(true);
+            Ok(true)
         }
     } else {
         event.send_message_to_source(
@@ -241,6 +243,6 @@ async fn mc_server_status(event: &GroupMessageEvent, mc_type: Option<String>, na
                 .text("此命令仅管理员/群主可用")
                 .build()
         ).await?;
-        return Ok(true);
+        Ok(true)
     }
 }

@@ -1,8 +1,7 @@
 use og_image_writer::{style, TextArea};
 use og_image_writer::writer::OGImageWriter;
 use crate::BotResult;
-use crate::utils::file_util::file_tmp_random_image_path;
-use crate::utils::image::{file_to_image, MSYHBD};
+
 
 // pub fn help_module_image(module_setting:&ModuleSetting) -> BotResult<Vec<u8>> {
 //     let i = module_setting.usage.split("\n").collect::<Vec<_>>().len();
